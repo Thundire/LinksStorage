@@ -9,6 +9,11 @@
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="IconBtnFreeSolid" TargetType="Button">
+                <Setter Property="FontFamily" Value="FAFreeSolid" />
+                <Setter Property="FontSize" Value="26"/>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

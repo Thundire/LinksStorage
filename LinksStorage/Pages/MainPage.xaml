@@ -5,7 +5,7 @@
              x:Class="LinksStorage.Pages.MainPage"
              x:DataType="viewModels:RootVM">
 
-    <Grid RowDefinitions="Auto, *, 60">
+    <Grid RowDefinitions="Auto, *, 60" Padding="20">
         <!-- Hot Links -->
         <ListView ItemsSource="{Binding HotLinks}" SelectionMode="None">
             <ListView.ItemTemplate>
@@ -23,10 +23,10 @@
             </ListView.ItemTemplate>
         </ListView>
         <!-- Group Add Form -->
-        <Grid Grid.Row="2" ColumnDefinitions="*, Auto, Auto">
+        <Grid Grid.Row="2" ColumnDefinitions="*, Auto, Auto" ColumnSpacing="10">
             <Entry Placeholder="Group Name"/>
-            <Button Grid.Column="1" Text="Add"/>
-            <Button Grid.Column="2" Text="Cancel"/>
+            <Button Grid.Column="1" Text="check" Style="{StaticResource IconBtnFreeSolid}"/>
+            <Button Grid.Column="2" Text="Cancel" Style="{StaticResource IconBtnFreeSolid}"/>
         </Grid>
     </Grid>
 
