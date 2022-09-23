@@ -8,13 +8,13 @@
     <Grid RowDefinitions="*, 60">
         <ScrollView>
             <VerticalStackLayout>
-                <ListView ItemsSource="{Binding Groups}"></ListView>
-                <ListView ItemsSource="{Binding Links}"></ListView>
+                <CollectionView ItemsSource="{Binding Groups}"></CollectionView>
+                <CollectionView ItemsSource="{Binding Links}"></CollectionView>
             </VerticalStackLayout>
         </ScrollView>
 
         <HorizontalStackLayout Grid.Row="1">
-            <Button Text="Add Group"/>
+            <Button Text="Add Group" Clicked="PopupAddGroupForm"/>
             <Button Text="Add Link"/>
         </HorizontalStackLayout>
     </Grid>
