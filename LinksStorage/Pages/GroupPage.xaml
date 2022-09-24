@@ -14,7 +14,7 @@
         </ScrollView>
 
         <HorizontalStackLayout Grid.Row="1">
-            <Button Text="Add Group" Clicked="PopupAddGroupForm"/>
+            <Button Text="Add Group" Command="{Binding AddGroupCommand}"/>
             <Button Text="Add Link"/>
         </HorizontalStackLayout>
     </Grid>

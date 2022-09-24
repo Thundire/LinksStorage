@@ -19,9 +19,12 @@ public partial class RootVM : ObservableObject
     public ObservableCollection<string> HotLinks { get; }
     public ObservableCollection<string> Groups { get; }
     
-    private void AddGroup(object _, GroupName args)
+    [RelayCommand]
+    private async Task AddGroup()
     {
-        Groups.Add(args.Name);
+        var input = await Shell.Current.DisplayPromptAsync("Add Group", "Enter group name");
+        if(input is not {Length: > 0}) return;
+        Groups.Add(input);
     }
 
     [RelayCommand]
@@ -36,6 +39,10 @@ public partial class RootVM : ObservableObject
 
 public partial class GroupVM : ObservableObject, IQueryAttributable
 {
+
+[QueryProperty(nameof(Group), "group")]
+public partial class GroupVM : ObservableObject, IDisposable
+{
     [ObservableProperty] private string _group;
 
     public GroupVM()
@@ -48,6 +55,13 @@ public partial class GroupVM : ObservableObject, IQueryAttributable
     public ObservableCollection<string> Links { get; }
     public ObservableCollection<string> Groups { get; }
 
+    [RelayCommand]
+    private async Task AddGroup(string name)
+    {
+        var input = await Shell.Current.DisplayPromptAsync("Add Group", "Enter group name");
+        if (input is not { Length: > 0 }) return;
+        Groups.Add(name);
+    }
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         _group = query["group"].ToString();

@@ -32,7 +32,7 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
         <!-- Group Add Form -->
-        <Button Grid.Row="2" Text="Add Group" Clicked="PopupAddGroupForm"/>
+        <Button Grid.Row="2" Text="Add Group" Command="{Binding AddGroupCommand}"/>
     </Grid>
 
 </ContentPage>
