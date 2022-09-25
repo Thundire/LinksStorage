@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -15,14 +16,14 @@ public partial class RootVM : ObservableObject, IDisposable
     }
 
     public ObservableCollection<LinkInfo> HotLinks { get; }
-    public ObservableCollection<string> Groups { get; }
+    public ObservableCollection<GroupInfo> Groups { get; }
 
     [RelayCommand]
     private async Task AddGroup()
     {
         var input = await Shell.Current.DisplayPromptAsync("Add Group", "Enter group name");
-        if(input is not {Length: > 0}) return;
-        Groups.Add(input);
+        if (input is not { Length: > 0 }) return;
+        Groups.Add(new GroupInfo { Id = Guid.NewGuid(), Name = input });
     }
 
     [RelayCommand]
@@ -69,14 +70,14 @@ public partial class GroupVM : ObservableObject, IDisposable
     }
 
     public ObservableCollection<LinkInfo> Links { get; }
-    public ObservableCollection<string> Groups { get; }
+    public ObservableCollection<GroupInfo> Groups { get; }
 
     [RelayCommand]
     private async Task AddGroup()
     {
         var input = await Shell.Current.DisplayPromptAsync("Add Group", "Enter group name");
         if (input is not { Length: > 0 }) return;
-        Groups.Add(input);
+        Groups.Add(new GroupInfo { Id = Guid.NewGuid(), Name = input });
     }
 
     [RelayCommand]
@@ -128,7 +129,7 @@ public partial class LinkEditVM : ObservableObject, IQueryAttributable
     private bool _isFromRoot;
     private Guid _id;
 
-    [ObservableProperty] 
+    [ObservableProperty]
     private bool _isNew;
 
     [ObservableProperty]
@@ -206,6 +207,13 @@ public partial class LinkInfo : ObservableObject
         Alias = data.Alias;
         Url = data.Url;
     }
+}
+
+public partial class GroupInfo : ObservableObject
+{
+    [ObservableProperty] private Guid _id;
+    [ObservableProperty] private string _name;
+    [ObservableProperty] private bool _isEmpty = true;
 }
 
 public record LinkCreateInfo(string Parent);

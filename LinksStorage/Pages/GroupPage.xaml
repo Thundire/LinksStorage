@@ -3,7 +3,6 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:LinksStorage.ViewModels"
-             xmlns:system="clr-namespace:System;assembly=System.Runtime"
              x:Class="LinksStorage.Pages.GroupPage"
              x:DataType="viewModels:GroupVM">
     <Grid RowDefinitions="*, 60">
@@ -12,13 +11,13 @@
                 <!-- Groups List -->
                 <CollectionView ItemsSource="{Binding Groups}">
                     <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="system:String">
+                        <DataTemplate x:DataType="viewModels:GroupInfo">
                             <Frame>
                                 <Frame.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:GroupVM}}, Path=OpenGroupCommand}"
-                                                          CommandParameter="{Binding .}"/>
+                                                          CommandParameter="{Binding Name}"/>
                                 </Frame.GestureRecognizers>
-                                <Label Text="{Binding .}"/>
+                                <Label Text="{Binding Name}"/>
                             </Frame>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
