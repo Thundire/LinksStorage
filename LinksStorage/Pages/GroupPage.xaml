@@ -3,19 +3,47 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:LinksStorage.ViewModels"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
              x:Class="LinksStorage.Pages.GroupPage"
              x:DataType="viewModels:GroupVM">
     <Grid RowDefinitions="*, 60">
         <ScrollView>
             <VerticalStackLayout>
-                <CollectionView ItemsSource="{Binding Groups}"></CollectionView>
-                <CollectionView ItemsSource="{Binding Links}"></CollectionView>
+                <!-- Groups List -->
+                <CollectionView ItemsSource="{Binding Groups}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="system:String">
+                            <Frame>
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:GroupVM}}, Path=OpenGroupCommand}"
+                                                          CommandParameter="{Binding .}"/>
+                                </Frame.GestureRecognizers>
+                                <Label Text="{Binding .}"/>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- Links List -->
+                <CollectionView ItemsSource="{Binding Links}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="viewModels:LinkInfo">
+                            <Frame>
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:GroupVM}}, Path=EditLinkCommand}"
+                                                          CommandParameter="{Binding .}"/>
+                                </Frame.GestureRecognizers>
+                                <Label Text="{Binding Alias}"/>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
             </VerticalStackLayout>
         </ScrollView>
 
         <HorizontalStackLayout Grid.Row="1">
             <Button Text="Add Group" Command="{Binding AddGroupCommand}"/>
-            <Button Text="Add Link"/>
+            <Button Text="Add Link" Command="{Binding AddLinkCommand}"/>
         </HorizontalStackLayout>
     </Grid>
 </ContentPage>

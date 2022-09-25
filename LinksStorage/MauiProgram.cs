@@ -24,6 +24,8 @@ public static class MauiProgram
         builder.Services
             .AddTransient<RootVM>()
             .AddTransient<MainPage>()
+            .AddTransient<LinkEditVM>()
+            .AddTransient<LinkEditPage>()
             .AddTransient<GroupVM>()
             .AddTransient<GroupPage>();
 

@@ -10,9 +10,9 @@
         <!-- Hot Links -->
         <CollectionView ItemsSource="{Binding HotLinks}">
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="system:String">
+                <DataTemplate x:DataType="viewModels:LinkInfo">
                     <Frame>
-                        <Label Text="{Binding .}"/>
+                        <Label Text="{Binding Alias}"/>
                     </Frame>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
