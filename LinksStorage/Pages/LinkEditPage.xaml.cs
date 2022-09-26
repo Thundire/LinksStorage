@@ -2,9 +2,9 @@
 
 namespace LinksStorage.Pages;
 
-public partial class MainPage : ContentPage
+public partial class LinkEditPage : ContentPage
 {
-    public MainPage(RootVM vm)
+    public LinkEditPage(LinkEditVM vm)
     {
         InitializeComponent();
         BindingContext = vm;

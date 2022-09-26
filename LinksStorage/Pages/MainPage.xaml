@@ -1,41 +1,59 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="LinksStorage.Pages.MainPage">
+             xmlns:viewModels="clr-namespace:LinksStorage.ViewModels"
+             xmlns:controls="clr-namespace:LinksStorage.Controls"
+             x:Class="LinksStorage.Pages.MainPage"
+             x:DataType="viewModels:RootVM">
 
-    <ScrollView>
-        <VerticalStackLayout
-            Spacing="25"
-            Padding="30,0"
-            VerticalOptions="Center">
+    <Grid RowDefinitions="Auto, *, Auto, Auto" Padding="20">
+        <!-- Hot Links -->
+        <CollectionView ItemsSource="{Binding HotLinks}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="viewModels:LinkInfo">
+                    <Frame>
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootVM}}, Path=EditLinkCommand}"
+                                                  CommandParameter="{Binding .}"/>
+                        </Frame.GestureRecognizers>
 
-            <Image
-                Source="dotnet_bot.png"
-                SemanticProperties.Description="Cute dot net bot waving hi to you!"
-                HeightRequest="200"
-                HorizontalOptions="Center" />
+                        <Grid ColumnDefinitions="22, *, 40, 40, 40" ColumnSpacing="8"
+                              HeightRequest="40">
+                            <Image VerticalOptions="Center" Aspect="Center">
+                                <Image.Source>
+                                    <FontImageSource Glyph="&#xf0c1;" FontFamily="FAFreeSolid" Size="20" Color="Orange"/>
+                                </Image.Source>
+                            </Image>
 
-            <Label
-                Text="Hello, World!"
-                SemanticProperties.HeadingLevel="Level1"
-                FontSize="32"
-                HorizontalOptions="Center" />
+                            <Label Grid.Column="1" Text="{Binding Alias}" LineBreakMode="TailTruncation" VerticalOptions="Center" TextColor="White"/>
 
-            <Label
-                Text="Welcome to .NET Multi-platform App UI"
-                SemanticProperties.HeadingLevel="Level2"
-                SemanticProperties.Description="Welcome to dot net Multi platform App U I"
-                FontSize="18"
-                HorizontalOptions="Center" />
-
-            <Button
-                x:Name="CounterBtn"
-                Text="Click me"
-                SemanticProperties.Hint="Counts the number of times you click"
-                Clicked="OnCounterClicked"
-                HorizontalOptions="Center" />
-
-        </VerticalStackLayout>
-    </ScrollView>
+                            <Button Grid.Column="2" Text="edit" Style="{StaticResource IconBtnFreeSolid}"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootVM}}, Path=EditLinkCommand}"
+                                    CommandParameter="{Binding .}"/>
+                            <Button Grid.Column="3" Text="remove" Style="{StaticResource IconBtnFreeSolid}"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootVM}}, Path=RemoveLinkCommand}"
+                                    CommandParameter="{Binding .}"/>
+                            <Button Grid.Column="4" Text="star" Style="{StaticResource IconBtnFreeSolid}"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootVM}}, Path=RemoveLinkFromHotListCommand}"
+                                    CommandParameter="{Binding .}"/>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <!-- Groups List -->
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Groups}" ItemSizingStrategy="MeasureAllItems">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="viewModels:GroupInfo">
+                    <controls:LinksGroup Group="{Binding .}"
+                                         OpenCommand="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootVM}}, Path=OpenGroupCommand}"
+                                         ChangeNameCommand="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootVM}}, Path=ChangeGroupNameCommand}"
+                                         RemoveCommand="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootVM}}, Path=RemoveGroupCommand}"/>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <!-- Group Add Form -->
+        <Button Grid.Row="2" Text="Add Group" Command="{Binding AddGroupCommand}"/>
+    </Grid>
 
 </ContentPage>
