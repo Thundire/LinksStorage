@@ -3,6 +3,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:LinksStorage.ViewModels"
+             xmlns:controls="clr-namespace:LinksStorage.Controls"
              x:Class="LinksStorage.Pages.GroupPage"
              x:DataType="viewModels:GroupVM">
     <Grid RowDefinitions="*, 60" Padding="20">
@@ -12,24 +13,10 @@
                 <CollectionView ItemsSource="{Binding Groups}" ItemSizingStrategy="MeasureFirstItem">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="viewModels:GroupInfo">
-                            <Frame Padding="6">
-                                <Frame.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:GroupVM}}, Path=OpenGroupCommand}"
-                                                          CommandParameter="{Binding Name}"/>
-                                </Frame.GestureRecognizers>
-
-                                <Grid ColumnDefinitions="*, Auto, Auto"
-                                      HeightRequest="40">
-                                    <Label Text="{Binding Name}" VerticalOptions="Center"/>
-
-                                    <Button Grid.Column="1" Text="edit" Style="{StaticResource IconBtnFreeSolid}"
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:GroupVM}}, Path=ChangeGroupNameCommand}"
-                                                CommandParameter="{Binding .}"/>
-                                    <Button Grid.Column="2" Text="remove" Style="{StaticResource IconBtnFreeSolid}"
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:GroupVM}}, Path=RemoveGroupCommand}"
-                                                CommandParameter="{Binding .}"/>
-                                </Grid>
-                            </Frame>
+                            <controls:LinksGroup Group="{Binding .}"
+                                                 OpenCommand="{Binding Source={RelativeSource AncestorType={x:Type viewModels:GroupVM}}, Path=OpenGroupCommand}"
+                                                 ChangeNameCommand="{Binding Source={RelativeSource AncestorType={x:Type viewModels:GroupVM}}, Path=ChangeGroupNameCommand}"
+                                                 RemoveCommand="{Binding Source={RelativeSource AncestorType={x:Type viewModels:GroupVM}}, Path=RemoveGroupCommand}"/>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
