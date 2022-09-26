@@ -36,12 +36,26 @@ public partial class RootVM : ObservableObject, IDisposable
     }
 
     [RelayCommand]
+    private async Task ChangeGroupName(GroupInfo info)
+    {
+        var input = await Shell.Current.DisplayPromptAsync("Add Group", "Enter group name", initialValue: info.Name);
+        if (input is not { Length: > 0 }) return;
+        info.Name = input;
+    }
+
+    [RelayCommand]
     private async Task EditLink(LinkInfo info)
     {
         await Shell.Current.GoToAsync(NavigationRoutes.LinkEditForm, new Dictionary<string, object>()
         {
             ["info"] = new LinkCreateInfo(NavigationRoutes.Root)
         });
+    }
+
+    [RelayCommand]
+    private void RemoveGroup(GroupInfo info)
+    {
+        Groups.Remove(info);
     }
 
     private void UpdateHotLink(object _, LinkInfo info)
@@ -87,6 +101,20 @@ public partial class GroupVM : ObservableObject, IDisposable
         {
             ["group"] = group
         });
+    }
+
+    [RelayCommand]
+    private async Task ChangeGroupName(GroupInfo info)
+    {
+        var input = await Shell.Current.DisplayPromptAsync("Add Group", "Enter group name", initialValue: info.Name);
+        if (input is not { Length: > 0 }) return;
+        info.Name = input;
+    }
+
+    [RelayCommand]
+    private void RemoveGroup(GroupInfo info)
+    {
+        Groups.Remove(info);
     }
 
     [RelayCommand]

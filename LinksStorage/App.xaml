@@ -12,7 +12,7 @@
 
             <Style x:Key="IconBtnFreeSolid" TargetType="Button">
                 <Setter Property="FontFamily" Value="FAFreeSolid" />
-                <Setter Property="FontSize" Value="26"/>
+                <Setter Property="FontSize" Value="18"/>
             </Style>
         </ResourceDictionary>
     </Application.Resources>

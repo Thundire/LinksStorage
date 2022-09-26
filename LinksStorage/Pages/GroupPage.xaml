@@ -5,19 +5,30 @@
              xmlns:viewModels="clr-namespace:LinksStorage.ViewModels"
              x:Class="LinksStorage.Pages.GroupPage"
              x:DataType="viewModels:GroupVM">
-    <Grid RowDefinitions="*, 60">
+    <Grid RowDefinitions="*, 60" Padding="20">
         <ScrollView>
             <VerticalStackLayout>
                 <!-- Groups List -->
-                <CollectionView ItemsSource="{Binding Groups}">
+                <CollectionView ItemsSource="{Binding Groups}" ItemSizingStrategy="MeasureFirstItem">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="viewModels:GroupInfo">
-                            <Frame>
+                            <Frame Padding="6">
                                 <Frame.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:GroupVM}}, Path=OpenGroupCommand}"
                                                           CommandParameter="{Binding Name}"/>
                                 </Frame.GestureRecognizers>
-                                <Label Text="{Binding Name}"/>
+
+                                <Grid ColumnDefinitions="*, Auto, Auto"
+                                      HeightRequest="40">
+                                    <Label Text="{Binding Name}" VerticalOptions="Center"/>
+
+                                    <Button Grid.Column="1" Text="edit" Style="{StaticResource IconBtnFreeSolid}"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:GroupVM}}, Path=ChangeGroupNameCommand}"
+                                                CommandParameter="{Binding .}"/>
+                                    <Button Grid.Column="2" Text="remove" Style="{StaticResource IconBtnFreeSolid}"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:GroupVM}}, Path=RemoveGroupCommand}"
+                                                CommandParameter="{Binding .}"/>
+                                </Grid>
                             </Frame>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
