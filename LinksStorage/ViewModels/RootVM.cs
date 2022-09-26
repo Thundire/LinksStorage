@@ -58,6 +58,18 @@ public partial class RootVM : ObservableObject, IDisposable
         Groups.Remove(info);
     }
 
+    [RelayCommand]
+    private void RemoveLink(LinkInfo info)
+    {
+        HotLinks.Remove(info);
+    }
+
+    [RelayCommand]
+    private void RemoveLinkFromHotList(LinkInfo info)
+    {
+        HotLinks.Remove(info);
+    }
+
     private void UpdateHotLink(object _, LinkInfo info)
     {
         HotLinks.FirstOrDefault(i => i.Id == info.Id)?.Update(info);
@@ -133,6 +145,12 @@ public partial class GroupVM : ObservableObject, IDisposable
         {
             ["info"] = new LinkEditInfo(_group, info.Id, info.Alias, info.Url)
         });
+    }
+
+    [RelayCommand]
+    private void RemoveLink(LinkInfo info)
+    {
+        Links.Remove(info);
     }
 
     private void AddLink(object _, LinkInfo info)

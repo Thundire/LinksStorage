@@ -12,7 +12,31 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="viewModels:LinkInfo">
                     <Frame>
-                        <Label Text="{Binding Alias}"/>
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootVM}}, Path=EditLinkCommand}"
+                                                  CommandParameter="{Binding .}"/>
+                        </Frame.GestureRecognizers>
+
+                        <Grid ColumnDefinitions="22, *, 40, 40, 40" ColumnSpacing="8"
+                              HeightRequest="40">
+                            <Image VerticalOptions="Center" Aspect="Center">
+                                <Image.Source>
+                                    <FontImageSource Glyph="&#xf0c1;" FontFamily="FAFreeSolid" Size="20" Color="Orange"/>
+                                </Image.Source>
+                            </Image>
+
+                            <Label Grid.Column="1" Text="{Binding Alias}" LineBreakMode="TailTruncation" VerticalOptions="Center" TextColor="White"/>
+
+                            <Button Grid.Column="2" Text="edit" Style="{StaticResource IconBtnFreeSolid}"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootVM}}, Path=EditLinkCommand}"
+                                    CommandParameter="{Binding .}"/>
+                            <Button Grid.Column="3" Text="remove" Style="{StaticResource IconBtnFreeSolid}"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootVM}}, Path=RemoveLinkCommand}"
+                                    CommandParameter="{Binding .}"/>
+                            <Button Grid.Column="4" Text="star" Style="{StaticResource IconBtnFreeSolid}"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootVM}}, Path=RemoveLinkFromHotListCommand}"
+                                    CommandParameter="{Binding .}"/>
+                        </Grid>
                     </Frame>
                 </DataTemplate>
             </CollectionView.ItemTemplate>

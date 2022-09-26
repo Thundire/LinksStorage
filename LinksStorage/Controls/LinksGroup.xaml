@@ -30,7 +30,7 @@
                         </Image.Triggers>
                     </Image>
 
-                    <Label Grid.Column="1" Text="{TemplateBinding Group.Name}" VerticalOptions="Center" TextColor="White"/>
+                    <Label Grid.Column="1" Text="{TemplateBinding Group.Name}" LineBreakMode="TailTruncation" VerticalOptions="Center" TextColor="White"/>
 
                     <Button Grid.Column="2" Text="edit" Style="{StaticResource IconBtnFreeSolid}"
                             Command="{TemplateBinding ChangeNameCommand}"
