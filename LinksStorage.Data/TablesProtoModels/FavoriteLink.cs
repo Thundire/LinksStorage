@@ -1,17 +1,15 @@
 ﻿using SQLite;
 
-namespace LinksStorage.Data;
+namespace LinksStorage.Data.TablesProtoModels;
 
-public class Link
+[Table("favorites")]
+public class FavoriteLink
 {
     [PrimaryKey, AutoIncrement]
     public int Id { get; set; }
 
     [Indexed]
-    public string Alias { get; set; }
-
-    [MaxLength(2050)]
-    public string Url { get; set; }
+    public int LinkId { get; set; }
 
     [Indexed]
     public int GroupId { get; set; }

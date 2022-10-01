@@ -1,7 +1,8 @@
 ﻿using SQLite;
 
-namespace LinksStorage.Data;
+namespace LinksStorage.Data.TablesProtoModels;
 
+[Table("groups")]
 public class Group
 {
     [PrimaryKey, AutoIncrement]
@@ -9,4 +10,6 @@ public class Group
 
     [Indexed]
     public string Name { get; set; }
+
+    public int GroupId { get; set; }
 }
