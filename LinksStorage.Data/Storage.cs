@@ -32,11 +32,17 @@ public class Storage
         return link.Id;
     }
 
-    public async Task RegisterFavoriteLink(int linkId)
+    public async Task UpdateLink(int id, string name, string url)
+    {
+        await _connection.ExecuteAsync($"update links set Name = '{name}, Url = '{url} where Id = {id}");
+    }
+
+    public async Task<LinkInfoData> RegisterFavoriteLink(int linkId)
     {
         var link = await _connection.FindAsync<Link>(linkId);
         FavoriteLink favorite = new() { LinkId = linkId, GroupId = link.GroupId };
         await _connection.InsertAsync(favorite);
+        return new () { Id = linkId, Name = link.Name, Url = link.Url };
     }
 
     public async Task<GroupData> GetRootPage()
