@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Maui;
 using LinksStorage.Data;
 using LinksStorage.Pages;
+using LinksStorage.Services;
 using LinksStorage.ViewModels;
 using Microsoft.Extensions.Configuration;
 
@@ -24,7 +25,7 @@ public static class MauiProgram
             });
 
         builder.Services
-            .AddTransient<RootVM>()
+            .AddTransient<RootGroupVM>()
             .AddTransient<MainPage>()
             .AddTransient<LinkEditVM>()
             .AddTransient<LinkEditPage>()
@@ -36,6 +37,7 @@ public static class MauiProgram
             ActivatorUtilities.CreateInstance<Storage>(
                 provider, 
                 provider.GetRequiredService<IConfiguration>()["database"]));
+        builder.Services.AddSingleton<DataPersistenceOutbox>();
 
         return builder.Build();
     }

@@ -4,7 +4,7 @@ namespace LinksStorage.Pages;
 
 public partial class MainPage : ContentPage
 {
-    public MainPage(RootVM vm)
+    public MainPage(RootGroupVM vm)
     {
         InitializeComponent();
         BindingContext = vm;

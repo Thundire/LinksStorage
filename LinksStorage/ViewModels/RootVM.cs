@@ -1,132 +1,155 @@
 ﻿using System.Collections.ObjectModel;
-
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
+using LinksStorage.Data;
+using LinksStorage.Services;
+
 namespace LinksStorage.ViewModels;
 
-public partial class RootVM : ObservableObject, IDisposable
+public partial class RootGroupVM : ObservableObject, IDisposable
 {
-    public RootVM()
+    protected readonly IMessagingCenter _messenger;
+    private readonly IServiceScopeFactory _scopeFactory;
+    private static readonly object SenderMark = new();
+    public int GroupId { get; set; }
+
+    [ObservableProperty] private ObservableCollection<LinkInfo> _links;
+    [ObservableProperty] private ObservableCollection<GroupInfo> _groups;
+
+    public RootGroupVM(IMessagingCenter messenger, IServiceScopeFactory scopeFactory)
     {
-        HotLinks = new();
-        Groups = new();
+        GroupId = 1;
 
-        MessagingCenter.Subscribe<object, LinkInfo>(this, Messages.EditLink, UpdateHotLink);
-    }
+        _messenger = messenger;
+        _scopeFactory = scopeFactory;
 
-    public ObservableCollection<LinkInfo> HotLinks { get; }
-    public ObservableCollection<GroupInfo> Groups { get; }
-
-    [RelayCommand]
-    private async Task AddGroup()
-    {
-        var input = await Shell.Current.DisplayPromptAsync("Add Group", "Enter group name");
-        if (input is not { Length: > 0 }) return;
-        Groups.Add(new GroupInfo { Id = Guid.NewGuid(), Name = input });
-    }
-
-    [RelayCommand]
-    private async Task OpenGroup(string group)
-    {
-        await Shell.Current.GoToAsync(NavigationRoutes.Group, new Dictionary<string, object>()
-        {
-            ["group"] = group
-        });
-    }
-
-    [RelayCommand]
-    private async Task ChangeGroupName(GroupInfo info)
-    {
-        var input = await Shell.Current.DisplayPromptAsync("Add Group", "Enter group name", initialValue: info.Name);
-        if (input is not { Length: > 0 }) return;
-        info.Name = input;
-    }
-
-    [RelayCommand]
-    private async Task EditLink(LinkInfo info)
-    {
-        await Shell.Current.GoToAsync(NavigationRoutes.LinkEditForm, new Dictionary<string, object>()
-        {
-            ["info"] = new LinkCreateInfo(NavigationRoutes.Root)
-        });
-    }
-
-    [RelayCommand]
-    private void RemoveGroup(GroupInfo info)
-    {
-        Groups.Remove(info);
-    }
-
-    [RelayCommand]
-    private void RemoveLink(LinkInfo info)
-    {
-        HotLinks.Remove(info);
-    }
-
-    [RelayCommand]
-    private void RemoveLinkFromHotList(LinkInfo info)
-    {
-        HotLinks.Remove(info);
-    }
-
-    private void UpdateHotLink(object _, LinkInfo info)
-    {
-        HotLinks.FirstOrDefault(i => i.Id == info.Id)?.Update(info);
-    }
-
-    public void Dispose()
-    {
-        MessagingCenter.Unsubscribe<object, LinkInfo>(this, Messages.EditLink);
-    }
-}
-
-[QueryProperty(nameof(Group), "group")]
-public partial class GroupVM : ObservableObject, IDisposable
-{
-    [ObservableProperty] private string _group;
-
-    public GroupVM()
-    {
         Links = new();
         Groups = new();
 
-        MessagingCenter.Subscribe<object, LinkInfo>(this, Messages.CreateLink, AddLink);
-        MessagingCenter.Subscribe<object, LinkInfo>(this, Messages.EditLink, EditLink);
+        messenger.Subscribe<DataPersistenceOutbox, MarkedLinkAsFavorite>(this, nameof(MarkedLinkAsFavorite), MarkLinkAsFavorite);
+        messenger.Subscribe<DataPersistenceOutbox, RemovedMarkLinkAsFavorite>(this, nameof(RemovedMarkLinkAsFavorite), RemoveMarkLinkAsFavorite);
+        messenger.Subscribe<DataPersistenceOutbox, RemovedLink>(this, nameof(RemovedLink), RemoveLink);
+        messenger.Subscribe<DataPersistenceOutbox, RemovedGroup>(this, nameof(RemovedGroup), RemoveGroup);
+        messenger.Subscribe<DataPersistenceOutbox, CreatedGroup>(this, nameof(CreatedGroup), AddGroup);
+        messenger.Subscribe<DataPersistenceOutbox, EditLink>(this, nameof(EditLink), UpdateLink);
     }
 
-    public ObservableCollection<LinkInfo> Links { get; }
-    public ObservableCollection<GroupInfo> Groups { get; }
+    [RelayCommand]
+    private async Task Refresh()
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var storage = await scope.ServiceProvider.GetRequiredService<Storage>().Initialize();
+        var rootData = await storage.GetRootPage();
+
+        Links = new(rootData.Links.Select(x=> new LinkInfo(x)));
+        Groups = new(rootData.Groups.Select(x=> new GroupInfo(x)));
+    }
 
     [RelayCommand]
     private async Task AddGroup()
     {
         var input = await Shell.Current.DisplayPromptAsync("Add Group", "Enter group name");
         if (input is not { Length: > 0 }) return;
-        Groups.Add(new GroupInfo { Id = Guid.NewGuid(), Name = input });
+        _messenger.Send(SenderMark, nameof(CreateGroup), new CreateGroup(input, GroupId));
     }
 
     [RelayCommand]
-    private async Task OpenGroup(string group)
+    private async Task OpenGroup(int groupId)
     {
         await Shell.Current.GoToAsync(NavigationRoutes.Group, new Dictionary<string, object>()
         {
-            ["group"] = group
+            ["group"] = groupId
         });
     }
 
     [RelayCommand]
-    private async Task ChangeGroupName(GroupInfo info)
+    private async Task ChangeGroupName(GroupInfo payload)
     {
-        var input = await Shell.Current.DisplayPromptAsync("Add Group", "Enter group name", initialValue: info.Name);
+        var input = await Shell.Current.DisplayPromptAsync("Add Group", "Enter group name", initialValue: payload.Name);
         if (input is not { Length: > 0 }) return;
-        info.Name = input;
+        _messenger.Send(SenderMark, nameof(ChangeGroupName), new ChangeGroupName(payload.Id, input));
     }
 
     [RelayCommand]
-    private void RemoveGroup(GroupInfo info)
+    private async Task EditLink(LinkInfo payload)
     {
-        Groups.Remove(info);
+        await Shell.Current.GoToAsync(NavigationRoutes.LinkEditForm, new Dictionary<string, object>()
+        {
+            ["payload"] = new LinkEditInfo(GroupId, payload.Id, payload.Name, payload.Url)
+        });
+    }
+
+    [RelayCommand]
+    private void RemoveGroup(GroupInfo payload)
+    {
+        _messenger.Send(SenderMark, nameof(RemoveGroup), new RemoveGroup(payload.Id));
+    }
+
+    [RelayCommand]
+    private void RemoveLink(LinkInfo payload)
+    {
+        _messenger.Send(SenderMark, nameof(RemoveLink), new RemoveLink(payload.Id));
+    }
+
+    [RelayCommand]
+    private void RemoveLinkFromHotList(LinkInfo payload)
+    {
+        _messenger.Send(SenderMark, nameof(Services.RemoveMarkLinkAsFavorite), new RemoveMarkLinkAsFavorite(payload.Id));
+    }
+
+    private void AddGroup(DataPersistenceOutbox _, CreatedGroup args)
+    {
+        if (args.ParentGroupId != GroupId) return;
+        Groups.Add(new() { Id = args.Id, Name = args.Name });
+    }
+
+    private void RemoveGroup(DataPersistenceOutbox _, RemovedGroup args)
+    {
+        if (Groups.FirstOrDefault(x => x.Id == args.Id) is not { } entry) return;
+        Groups.Remove(entry);
+    }
+
+    private void RemoveLink(DataPersistenceOutbox _, RemovedLink args)
+    {
+        if (Links.FirstOrDefault(x => x.Id == args.Id) is not { } entry) return;
+        Links.Remove(entry);
+    }
+
+    protected virtual void RemoveMarkLinkAsFavorite(DataPersistenceOutbox _, RemovedMarkLinkAsFavorite args)
+    {
+        if (Links.FirstOrDefault(x => x.Id == args.Id) is not { } entry) return;
+        Links.Remove(entry);
+    }
+
+    protected virtual void MarkLinkAsFavorite(DataPersistenceOutbox _, MarkedLinkAsFavorite args)
+    {
+        Links.Add(new() { Id = args.Id, Name = args.Name, Url = args.Url });
+    }
+
+    private void UpdateLink(DataPersistenceOutbox _, EditLink args)
+    {
+        Links.FirstOrDefault(i => i.Id == args.Id)?.Update(args);
+    }
+
+    public virtual void Dispose()
+    {
+        _messenger.Unsubscribe<DataPersistenceOutbox, MarkedLinkAsFavorite>(this, nameof(MarkedLinkAsFavorite));
+        _messenger.Unsubscribe<DataPersistenceOutbox, RemovedMarkLinkAsFavorite>(this, nameof(RemovedMarkLinkAsFavorite));
+        _messenger.Unsubscribe<DataPersistenceOutbox, RemovedLink>(this, nameof(RemovedLink));
+        _messenger.Unsubscribe<DataPersistenceOutbox, RemovedGroup>(this, nameof(RemovedGroup));
+        _messenger.Unsubscribe<DataPersistenceOutbox, CreatedGroup>(this, nameof(CreatedGroup));
+        _messenger.Unsubscribe<DataPersistenceOutbox, EditLink>(this, nameof(EditLink));
+    }
+}
+
+[QueryProperty(nameof(GroupId), "group")]
+public sealed partial class GroupVM : RootGroupVM
+{
+    public GroupVM(IMessagingCenter messenger, IServiceScopeFactory scopeFactory) : base(messenger, scopeFactory)
+    {
+        messenger.Subscribe<DataPersistenceOutbox, CreatedLink>(this, nameof(CreatedLink), AddLink);
+
     }
 
     [RelayCommand]
@@ -134,71 +157,72 @@ public partial class GroupVM : ObservableObject, IDisposable
     {
         await Shell.Current.GoToAsync(NavigationRoutes.LinkEditForm, new Dictionary<string, object>()
         {
-            ["info"] = new LinkCreateInfo(_group)
+            ["payload"] = new LinkCreateInfo(GroupId)
         });
     }
 
-    [RelayCommand]
-    private async Task EditLink(LinkInfo info)
+    private void AddLink(DataPersistenceOutbox _, CreatedLink args)
     {
-        await Shell.Current.GoToAsync(NavigationRoutes.LinkEditForm, new Dictionary<string, object>()
-        {
-            ["info"] = new LinkEditInfo(_group, info.Id, info.Alias, info.Url)
-        });
+        if(args.GroupId != GroupId) return;
+        Links.Add(new(){Id = args.Id, Name = args.Name, Url = args.Url});
     }
 
-    [RelayCommand]
-    private void RemoveLink(LinkInfo info)
+    protected override void MarkLinkAsFavorite(DataPersistenceOutbox _, MarkedLinkAsFavorite args)
     {
-        Links.Remove(info);
+        if(Links.FirstOrDefault(x=>x.Id == args.Id) is not {} entry) return;
+        entry.IsFavorite = true;
     }
 
-    private void AddLink(object _, LinkInfo info)
+    protected override void RemoveMarkLinkAsFavorite(DataPersistenceOutbox _, RemovedMarkLinkAsFavorite args)
     {
-        Links.Add(info);
-    }
-    private void EditLink(object _, LinkInfo info)
-    {
-        Links.FirstOrDefault(i => i.Id == info.Id)?.Update(info);
+        if (Links.FirstOrDefault(x => x.Id == args.Id) is not { } entry) return;
+        entry.IsFavorite = false;
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
-        MessagingCenter.Unsubscribe<object, LinkInfo>(this, Messages.CreateLink);
-        MessagingCenter.Unsubscribe<object, LinkInfo>(this, Messages.EditLink);
+        _messenger.Unsubscribe<DataPersistenceOutbox, CreatedLink>(this, nameof(CreatedLink));
+        base.Dispose();
     }
 }
 
 public partial class LinkEditVM : ObservableObject, IQueryAttributable
 {
-    private string _parent;
+    private readonly IMessagingCenter _messenger;
+    private static readonly object SenderMark = new();
+    private int _group;
     private bool _isFromRoot;
-    private Guid _id;
+    private int _id;
 
     [ObservableProperty]
     private bool _isNew;
 
     [ObservableProperty]
-    private string _alias;
+    private string _name;
     [ObservableProperty]
     private string _url;
 
+    public LinkEditVM(IMessagingCenter messenger)
+    {
+        _messenger = messenger;
+    }
+
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
-        var info = query["info"];
-        if (info is LinkCreateInfo createInfo)
+        var payload = query["payload"];
+        if (payload is LinkCreateInfo createInfo)
         {
-            _id = Guid.NewGuid();
+            _id = 0;
             _isNew = true;
-            _parent = createInfo.Parent;
+            _group = createInfo.Group;
             return;
         }
 
-        if (info is not LinkEditInfo editInfo) throw new InvalidOperationException("Link Edit VM need for edit or create links");
+        if (payload is not LinkEditInfo editInfo) throw new InvalidOperationException("Link Edit VM need for edit or create links");
 
         _id = editInfo.Id;
-        _parent = editInfo.Parent;
-        Alias = editInfo.Alias;
+        _group = editInfo.Group;
+        Name = editInfo.Name;
         Url = editInfo.Url;
         _isFromRoot = editInfo.IsFromRoot;
     }
@@ -206,26 +230,20 @@ public partial class LinkEditVM : ObservableObject, IQueryAttributable
     [RelayCommand]
     private async Task Save()
     {
-        string message = _isNew ? Messages.CreateLink : Messages.EditLink;
-        LinkInfo info = new()
+        if (_isNew)
         {
-            Id = _isNew ? Guid.NewGuid() : _id,
-            Alias = Alias,
-            Url = Url,
-            Parent = _parent
-        };
-        MessagingCenter.Send<object, LinkInfo>(new object(), message, info);
+            _messenger.Send(SenderMark, nameof(CreateLink), new CreateLink(_name, _url, _group));
+        }
+        else
+        {
+            _messenger.Send(SenderMark, nameof(EditLink), new EditLink(_id, _name, _url, _group));
+        }
+
         await Shell.Current.GoToAsync("..", new Dictionary<string, object>()
         {
-            ["group"] = _isFromRoot ? null : _parent
+            ["group"] = _isFromRoot ? null : _group
         });
     }
-}
-
-public static class Messages
-{
-    public const string EditLink = nameof(EditLink);
-    public const string CreateLink = nameof(CreateLink);
 }
 
 public static class NavigationRoutes
@@ -235,31 +253,46 @@ public static class NavigationRoutes
     public const string LinkEditForm = "linkEditForm";
 }
 
-public record LinkEditInfo(string Parent, Guid Id, string Alias, string Url)
+public record LinkEditInfo(int Group, int Id, string Name, string Url)
 {
-    public bool IsFromRoot => Parent == NavigationRoutes.Root;
+    public bool IsFromRoot => Group == 1;
 }
 
 public partial class LinkInfo : ObservableObject
 {
-    [ObservableProperty] private Guid _id;
-    [ObservableProperty] private string _alias;
+    [ObservableProperty] private int _id;
+    [ObservableProperty] private string _name;
     [ObservableProperty] private string _url;
-    [ObservableProperty] private string _parent;
-    [ObservableProperty] private bool _isHotLink;
+    [ObservableProperty] private bool _isFavorite;
 
-    public void Update(LinkInfo data)
+    public LinkInfo() { }
+    public LinkInfo(LinkInfoData data)
     {
-        Alias = data.Alias;
-        Url = data.Url;
+        _id = data.Id;
+        _name = data.Name;
+        _url = data.Url;
+    }
+    
+    public void Update(EditLink data) => Update(data.Name, data.Url);
+
+    private void Update(string name, string url)
+    {
+        Name = name;
+        Url = url;
     }
 }
 
 public partial class GroupInfo : ObservableObject
 {
-    [ObservableProperty] private Guid _id;
+    [ObservableProperty] private int _id;
     [ObservableProperty] private string _name;
-    [ObservableProperty] private bool _isEmpty = true;
+
+    public GroupInfo() { }
+    public GroupInfo(GroupInfoData data)
+    {
+        _id = data.Id;
+        _name = data.Name;
+    }
 }
 
-public record LinkCreateInfo(string Parent);
+public record LinkCreateInfo(int Group);

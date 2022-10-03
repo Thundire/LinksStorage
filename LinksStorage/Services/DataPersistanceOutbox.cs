@@ -2,7 +2,7 @@
 
 namespace LinksStorage.Services;
 
-internal class DataPersistenceOutbox
+public class DataPersistenceOutbox
 {
     private readonly IServiceScopeFactory _scopeFactory;
 
