@@ -12,10 +12,11 @@ public class Storage
         _connection = new(connectionString);
     }
 
-    public async Task Initialize()
+    public async Task<Storage> Initialize()
     {
         await _connection.CreateTablesAsync<FavoriteLink, Group, Link>();
         await _connection.ExecuteAsync("insert into groups(Name) select 'root' where not exists (select 1 from groups where Id = 1 and Name = 'root')");
+        return this;
     }
 
     public async Task<int> AddGroup(string name, int parentGroupId)
