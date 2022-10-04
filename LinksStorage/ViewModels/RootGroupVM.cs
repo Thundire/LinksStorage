@@ -11,7 +11,7 @@ public partial class RootGroupVM : ObservableObject, IDisposable
 {
     protected readonly IMessagingCenter _messenger;
     private readonly IServiceScopeFactory _scopeFactory;
-    private static readonly object SenderMark = new();
+    protected static readonly object SenderMark = new();
     public int GroupId { get; set; }
 
     [ObservableProperty] private ObservableCollection<LinkInfo> _links;
@@ -32,7 +32,7 @@ public partial class RootGroupVM : ObservableObject, IDisposable
         messenger.Subscribe<DataPersistenceOutbox, RemovedLink>(this, nameof(RemovedLink), RemoveLink);
         messenger.Subscribe<DataPersistenceOutbox, RemovedGroup>(this, nameof(RemovedGroup), RemoveGroup);
         messenger.Subscribe<DataPersistenceOutbox, CreatedGroup>(this, nameof(CreatedGroup), AddGroup);
-        messenger.Subscribe<DataPersistenceOutbox, EditLink>(this, nameof(EditLink), UpdateLink);
+        messenger.Subscribe<DataPersistenceOutbox, EditLink>(this, nameof(Services.EditLink), UpdateLink);
     }
 
     [RelayCommand]
@@ -83,19 +83,25 @@ public partial class RootGroupVM : ObservableObject, IDisposable
     [RelayCommand]
     private void RemoveGroup(GroupInfo payload)
     {
-        _messenger.Send(SenderMark, nameof(RemoveGroup), new RemoveGroup(payload.Id));
+        _messenger.Send(SenderMark, nameof(Services.RemoveGroup), new RemoveGroup(payload.Id));
     }
 
     [RelayCommand]
     private void RemoveLink(LinkInfo payload)
     {
-        _messenger.Send(SenderMark, nameof(RemoveLink), new RemoveLink(payload.Id));
+        _messenger.Send(SenderMark, nameof(Services.RemoveLink), new RemoveLink(payload.Id));
     }
 
     [RelayCommand]
-    private void RemoveLinkFromHotList(LinkInfo payload)
+    private void RemoveMarkLinkAsFavorite(LinkInfo payload)
     {
         _messenger.Send(SenderMark, nameof(Services.RemoveMarkLinkAsFavorite), new RemoveMarkLinkAsFavorite(payload.Id));
+    }
+
+    [RelayCommand]
+    private void OpenLinkInBrowser(LinkInfo payload)
+    {
+
     }
 
     private void AddGroup(DataPersistenceOutbox _, CreatedGroup args)
@@ -139,6 +145,6 @@ public partial class RootGroupVM : ObservableObject, IDisposable
         _messenger.Unsubscribe<DataPersistenceOutbox, RemovedLink>(this, nameof(RemovedLink));
         _messenger.Unsubscribe<DataPersistenceOutbox, RemovedGroup>(this, nameof(RemovedGroup));
         _messenger.Unsubscribe<DataPersistenceOutbox, CreatedGroup>(this, nameof(CreatedGroup));
-        _messenger.Unsubscribe<DataPersistenceOutbox, EditLink>(this, nameof(EditLink));
+        _messenger.Unsubscribe<DataPersistenceOutbox, EditLink>(this, nameof(Services.EditLink));
     }
 }

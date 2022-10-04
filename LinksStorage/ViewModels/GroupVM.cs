@@ -21,6 +21,12 @@ public sealed partial class GroupVM : RootGroupVM
         });
     }
 
+    [RelayCommand]
+    private void MarkLinkAsFavorite(LinkInfo payload)
+    {
+        _messenger.Send(SenderMark, nameof(Services.MarkLinkAsFavorite), new MarkLinkAsFavorite(payload.Id));
+    }
+
     private void AddLink(DataPersistenceOutbox _, CreatedLink args)
     {
         if(args.GroupId != GroupId) return;
