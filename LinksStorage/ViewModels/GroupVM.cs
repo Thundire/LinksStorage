@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using LinksStorage.Data;
 using LinksStorage.Services;
 
 namespace LinksStorage.ViewModels;
@@ -44,6 +45,8 @@ public sealed partial class GroupVM : RootGroupVM
         if (Links.FirstOrDefault(x => x.Id == args.Id) is not { } entry) return;
         entry.IsFavorite = false;
     }
+
+    protected override Task<GroupData> GetGroupData(int groupId, Storage storage) => storage.GetGroup(groupId);
 
     public override void Dispose()
     {

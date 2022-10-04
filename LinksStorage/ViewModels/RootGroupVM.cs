@@ -40,7 +40,7 @@ public partial class RootGroupVM : ObservableObject, IDisposable
     {
         using var scope = _scopeFactory.CreateScope();
         var storage = await scope.ServiceProvider.GetRequiredService<Storage>().Initialize();
-        var rootData = await storage.GetRootPage();
+        var rootData = await GetGroupData(GroupId, storage);
 
         Links = new(rootData.Links.Select(x=> new LinkInfo(x)));
         Groups = new(rootData.Groups.Select(x=> new GroupInfo(x)));
@@ -112,8 +112,7 @@ public partial class RootGroupVM : ObservableObject, IDisposable
 
     private void RemoveGroup(DataPersistenceOutbox _, RemovedGroup args)
     {
-        if (Groups.FirstOrDefault(x => x.Id == args.Id) is not { } entry) return;
-        Groups.Remove(entry);
+        Refresh().Wait();
     }
 
     private void RemoveLink(DataPersistenceOutbox _, RemovedLink args)
@@ -137,6 +136,8 @@ public partial class RootGroupVM : ObservableObject, IDisposable
     {
         Links.FirstOrDefault(i => i.Id == args.Id)?.Update(args);
     }
+
+    protected virtual Task<GroupData> GetGroupData(int groupId, Storage storage) => storage.GetRootPage();
 
     public virtual void Dispose()
     {
