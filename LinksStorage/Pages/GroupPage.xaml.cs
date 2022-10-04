@@ -9,4 +9,12 @@ public partial class GroupPage : ContentPage
         InitializeComponent();
         BindingContext = vm;
     }
+
+    private GroupVM VM => (GroupVM)BindingContext;
+
+    protected override async void OnNavigatedTo(NavigatedToEventArgs args)
+    {
+        await VM.Refresh();
+        base.OnNavigatedTo(args);
+    }
 }

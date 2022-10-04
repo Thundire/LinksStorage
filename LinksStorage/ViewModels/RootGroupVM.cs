@@ -36,7 +36,7 @@ public partial class RootGroupVM : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    private async Task Refresh()
+    public async Task Refresh()
     {
         using var scope = _scopeFactory.CreateScope();
         var storage = await scope.ServiceProvider.GetRequiredService<Storage>().Initialize();
