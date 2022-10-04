@@ -7,7 +7,11 @@ namespace LinksStorage.ViewModels;
 [QueryProperty(nameof(GroupId), "group")]
 public sealed partial class GroupVM : RootGroupVM
 {
-    public GroupVM(IMessagingCenter messenger, IServiceScopeFactory scopeFactory) : base(messenger, scopeFactory)
+    public GroupVM(
+        IMessagingCenter messenger,
+        IServiceScopeFactory scopeFactory,
+        BrowserLauncherService browserLauncherService)
+        : base(messenger, scopeFactory, browserLauncherService)
     {
         messenger.Subscribe<DataPersistenceOutbox, CreatedLink>(this, nameof(CreatedLink), AddLink);
 

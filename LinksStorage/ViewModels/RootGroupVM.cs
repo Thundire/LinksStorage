@@ -11,18 +11,23 @@ public partial class RootGroupVM : ObservableObject, IDisposable
 {
     protected readonly IMessagingCenter _messenger;
     private readonly IServiceScopeFactory _scopeFactory;
+    private readonly BrowserLauncherService _browserLauncherService;
     protected static readonly object SenderMark = new();
     public int GroupId { get; set; }
 
     [ObservableProperty] private ObservableCollection<LinkInfo> _links;
     [ObservableProperty] private ObservableCollection<GroupInfo> _groups;
 
-    public RootGroupVM(IMessagingCenter messenger, IServiceScopeFactory scopeFactory)
+    public RootGroupVM(
+        IMessagingCenter messenger,
+        IServiceScopeFactory scopeFactory,
+        BrowserLauncherService browserLauncherService)
     {
         GroupId = 1;
 
         _messenger = messenger;
         _scopeFactory = scopeFactory;
+        _browserLauncherService = browserLauncherService;
 
         Links = new();
         Groups = new();
@@ -99,9 +104,9 @@ public partial class RootGroupVM : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    private void OpenLinkInBrowser(LinkInfo payload)
+    private async Task OpenLinkInBrowser(LinkInfo payload)
     {
-
+        await _browserLauncherService.Open(payload.Url);
     }
 
     private void AddGroup(DataPersistenceOutbox _, CreatedGroup args)

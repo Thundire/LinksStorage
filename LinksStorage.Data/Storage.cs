@@ -35,7 +35,7 @@ public class Storage
 
     public async Task UpdateLink(int id, string name, string url)
     {
-        await _connection.ExecuteAsync($"update links set Name = '{name}, Url = '{url} where Id = {id}");
+        await _connection.ExecuteAsync($"update links set Name = '{name}', Url = '{url}' where Id = {id}");
     }
 
     public async Task<LinkInfoData> RegisterFavoriteLink(int linkId)
