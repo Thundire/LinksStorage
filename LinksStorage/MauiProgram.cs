@@ -38,6 +38,7 @@ public static class MauiProgram
                 provider, 
                 provider.GetRequiredService<IConfiguration>()["database"]));
         builder.Services.AddSingleton<DataPersistenceOutbox>();
+        builder.Services.AddSingleton<IMessagingCenter, MessagingCenter>();
 
         return builder.Build();
     }
