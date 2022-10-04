@@ -12,10 +12,11 @@ public class Storage
         _connection = new(connectionString);
     }
 
-    public async Task Initialize()
+    public async Task<Storage> Initialize()
     {
         await _connection.CreateTablesAsync<FavoriteLink, Group, Link>();
         await _connection.ExecuteAsync("insert into groups(Name) select 'root' where not exists (select 1 from groups where Id = 1 and Name = 'root')");
+        return this;
     }
 
     public async Task<int> AddGroup(string name, int parentGroupId)
@@ -32,11 +33,17 @@ public class Storage
         return link.Id;
     }
 
-    public async Task RegisterFavoriteLink(int linkId)
+    public async Task UpdateLink(int id, string name, string url)
+    {
+        await _connection.ExecuteAsync($"update links set Name = '{name}, Url = '{url} where Id = {id}");
+    }
+
+    public async Task<LinkInfoData> RegisterFavoriteLink(int linkId)
     {
         var link = await _connection.FindAsync<Link>(linkId);
         FavoriteLink favorite = new() { LinkId = linkId, GroupId = link.GroupId };
         await _connection.InsertAsync(favorite);
+        return new () { Id = linkId, Name = link.Name, Url = link.Url };
     }
 
     public async Task<GroupData> GetRootPage()

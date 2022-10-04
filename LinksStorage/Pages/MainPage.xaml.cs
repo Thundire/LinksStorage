@@ -4,9 +4,17 @@ namespace LinksStorage.Pages;
 
 public partial class MainPage : ContentPage
 {
-    public MainPage(RootVM vm)
+    public MainPage(RootGroupVM vm)
     {
         InitializeComponent();
         BindingContext = vm;
+    }
+
+    private RootGroupVM VM => (RootGroupVM)BindingContext;
+
+    protected override async void OnNavigatedTo(NavigatedToEventArgs args)
+    {
+        await VM.Refresh();
+        base.OnNavigatedTo(args);
     }
 }

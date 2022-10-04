@@ -5,10 +5,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:LinksStorage"
     xmlns:pages="clr-namespace:LinksStorage.Pages"
+    xmlns:viewModels="clr-namespace:LinksStorage.ViewModels"
     Shell.FlyoutBehavior="Disabled">
 
     <ShellContent
         ContentTemplate="{DataTemplate pages:MainPage}"
-        Route="root" />
+        Route="{x:Static Member=viewModels:NavigationRoutes.Root}" />
 
 </Shell>

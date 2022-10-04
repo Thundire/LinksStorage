@@ -7,8 +7,8 @@
              x:DataType="viewModels:LinkEditVM">
     <Grid RowDefinitions="*, Auto" Padding="20">
         <VerticalStackLayout>
-            <Label Text="Alias"/>
-            <Entry Text="{Binding Alias}"/>
+            <Label Text="Name"/>
+            <Entry Text="{Binding Name}"/>
             <Label Text="Url"/>
             <Entry Text="{Binding Url}"/>
         </VerticalStackLayout>

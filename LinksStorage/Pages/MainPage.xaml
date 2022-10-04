@@ -4,16 +4,16 @@
              xmlns:viewModels="clr-namespace:LinksStorage.ViewModels"
              xmlns:controls="clr-namespace:LinksStorage.Controls"
              x:Class="LinksStorage.Pages.MainPage"
-             x:DataType="viewModels:RootVM">
+             x:DataType="viewModels:RootGroupVM">
 
     <Grid RowDefinitions="Auto, *, Auto, Auto" Padding="20">
         <!-- Hot Links -->
-        <CollectionView ItemsSource="{Binding HotLinks}">
+        <CollectionView ItemsSource="{Binding Links}">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="viewModels:LinkInfo">
                     <Frame>
                         <Frame.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootVM}}, Path=EditLinkCommand}"
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootGroupVM}}, Path=OpenLinkInBrowserCommand}"
                                                   CommandParameter="{Binding .}"/>
                         </Frame.GestureRecognizers>
 
@@ -25,16 +25,16 @@
                                 </Image.Source>
                             </Image>
 
-                            <Label Grid.Column="1" Text="{Binding Alias}" LineBreakMode="TailTruncation" VerticalOptions="Center" TextColor="White"/>
+                            <Label Grid.Column="1" Text="{Binding Name}" LineBreakMode="TailTruncation" VerticalOptions="Center" TextColor="White"/>
 
                             <Button Grid.Column="2" Text="edit" Style="{StaticResource IconBtnFreeSolid}"
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootVM}}, Path=EditLinkCommand}"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootGroupVM}}, Path=EditLinkCommand}"
                                     CommandParameter="{Binding .}"/>
                             <Button Grid.Column="3" Text="remove" Style="{StaticResource IconBtnFreeSolid}"
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootVM}}, Path=RemoveLinkCommand}"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootGroupVM}}, Path=RemoveLinkCommand}"
                                     CommandParameter="{Binding .}"/>
-                            <Button Grid.Column="4" Text="star" Style="{StaticResource IconBtnFreeSolid}"
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootVM}}, Path=RemoveLinkFromHotListCommand}"
+                            <Button Grid.Column="4" Text="star" Style="{StaticResource IconBtnFreeRegular}"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootGroupVM}}, Path=RemoveMarkLinkAsFavoriteCommand}"
                                     CommandParameter="{Binding .}"/>
                         </Grid>
                     </Frame>
@@ -46,9 +46,9 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="viewModels:GroupInfo">
                     <controls:LinksGroup Group="{Binding .}"
-                                         OpenCommand="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootVM}}, Path=OpenGroupCommand}"
-                                         ChangeNameCommand="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootVM}}, Path=ChangeGroupNameCommand}"
-                                         RemoveCommand="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootVM}}, Path=RemoveGroupCommand}"/>
+                                         OpenCommand="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootGroupVM}}, Path=OpenGroupCommand}"
+                                         ChangeNameCommand="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootGroupVM}}, Path=ChangeGroupNameCommand}"
+                                         RemoveCommand="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootGroupVM}}, Path=RemoveGroupCommand}"/>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>

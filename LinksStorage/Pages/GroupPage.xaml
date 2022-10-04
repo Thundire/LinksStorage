@@ -27,11 +27,11 @@
                         <DataTemplate x:DataType="viewModels:LinkInfo">
                             <Frame BackgroundColor="Black" Padding="6">
                                 <Frame.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:GroupVM}}, Path=EditLinkCommand}"
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:GroupVM}}, Path=OpenLinkInBrowserCommand}"
                                                           CommandParameter="{Binding .}"/>
                                 </Frame.GestureRecognizers>
 
-                                <Grid ColumnDefinitions="22, *, 40, 40" ColumnSpacing="8"
+                                <Grid ColumnDefinitions="22, *, 40, 40, 40, 40" ColumnSpacing="8"
                                       HeightRequest="40">
                                     <Image VerticalOptions="Center" Aspect="Center">
                                         <Image.Source>
@@ -39,13 +39,19 @@
                                         </Image.Source>
                                     </Image>
 
-                                    <Label Grid.Column="1" Text="{Binding Alias}" LineBreakMode="TailTruncation" VerticalOptions="Center" TextColor="White"/>
+                                    <Label Grid.Column="1" Text="{Binding Name}" LineBreakMode="TailTruncation" VerticalOptions="Center" TextColor="White"/>
 
                                     <Button Grid.Column="2" Text="edit" Style="{StaticResource IconBtnFreeSolid}"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:GroupVM}}, Path=EditLinkCommand}"
                                             CommandParameter="{Binding .}"/>
                                     <Button Grid.Column="3" Text="remove" Style="{StaticResource IconBtnFreeSolid}"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:GroupVM}}, Path=RemoveLinkCommand}"
+                                            CommandParameter="{Binding .}"/>
+                                    <Button Grid.Column="4" Text="star" Style="{StaticResource IconBtnFreeSolid}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:GroupVM}}, Path=MarkLinkAsFavoriteCommand}"
+                                            CommandParameter="{Binding .}"/>
+                                    <Button Grid.Column="5" Text="star" Style="{StaticResource IconBtnFreeRegular}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:GroupVM}}, Path=RemoveMarkLinkAsFavoriteCommand}"
                                             CommandParameter="{Binding .}"/>
                                 </Grid>
                             </Frame>

@@ -1,6 +1,9 @@
 ﻿using CommunityToolkit.Maui;
+using LinksStorage.Data;
 using LinksStorage.Pages;
+using LinksStorage.Services;
 using LinksStorage.ViewModels;
+using Microsoft.Extensions.Configuration;
 
 namespace LinksStorage;
 
@@ -22,12 +25,20 @@ public static class MauiProgram
             });
 
         builder.Services
-            .AddTransient<RootVM>()
+            .AddTransient<RootGroupVM>()
             .AddTransient<MainPage>()
             .AddTransient<LinkEditVM>()
             .AddTransient<LinkEditPage>()
             .AddTransient<GroupVM>()
             .AddTransient<GroupPage>();
+
+        builder.Configuration["database"] = Path.Combine(FileSystem.AppDataDirectory, "LinksStorage.sqlite3");
+        builder.Services.AddScoped<Storage>(provider => 
+            ActivatorUtilities.CreateInstance<Storage>(
+                provider, 
+                provider.GetRequiredService<IConfiguration>()["database"]));
+        builder.Services.AddSingleton<DataPersistenceOutbox>();
+        builder.Services.AddSingleton<IMessagingCenter, MessagingCenter>();
 
         return builder.Build();
     }

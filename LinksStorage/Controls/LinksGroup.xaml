@@ -9,7 +9,7 @@
             <Frame Padding="6" BackgroundColor="Black">
                 <Frame.GestureRecognizers>
                     <TapGestureRecognizer Command="{TemplateBinding OpenCommand}"
-                                          CommandParameter="{TemplateBinding Group.Name}"/>
+                                          CommandParameter="{TemplateBinding Group.Id}"/>
                 </Frame.GestureRecognizers>
 
                 <Grid ColumnDefinitions="22, *, 40, 40" ColumnSpacing="8"
@@ -18,16 +18,6 @@
                         <Image.Source>
                             <FontImageSource Glyph="&#xf07c;" FontFamily="FAFreeSolid" Size="20" Color="Green"/>
                         </Image.Source>
-
-                        <Image.Triggers>
-                            <DataTrigger TargetType="Image" Binding="{TemplateBinding Group.IsEmpty}" Value="False">
-                                <Setter Property="Source">
-                                    <Setter.Value>
-                                        <FontImageSource Glyph="&#xf07c;" FontFamily="FAFreeRegular" Size="20"/>
-                                    </Setter.Value>
-                                </Setter>
-                            </DataTrigger>
-                        </Image.Triggers>
                     </Image>
 
                     <Label Grid.Column="1" Text="{TemplateBinding Group.Name}" LineBreakMode="TailTruncation" VerticalOptions="Center" TextColor="White"/>
