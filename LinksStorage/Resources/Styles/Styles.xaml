@@ -93,6 +93,8 @@
         <Setter Property="TextColor" Value="{StaticResource White}" />
         <Setter Property="FontFamily" Value="OpenSansRegular" />
         <Setter Property="FontSize" Value="14" />
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="LineBreakMode" Value="TailTruncation"/>
         <Setter Property="Shadow" Value="{StaticResource TextShadow}"/>
         <Setter Property="VisualStateManager.VisualStateGroups">
             <VisualStateGroupList>
