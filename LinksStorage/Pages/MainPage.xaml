@@ -3,57 +3,60 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:LinksStorage.ViewModels"
              xmlns:controls="clr-namespace:LinksStorage.Controls"
+             xmlns:resources="clr-namespace:LinksStorage.Resources"
              x:Class="LinksStorage.Pages.MainPage"
              x:DataType="viewModels:RootGroupVM">
 
-    <Grid RowDefinitions="Auto, *, Auto, Auto" Padding="20">
-        <!-- Hot Links -->
-        <CollectionView ItemsSource="{Binding Links}">
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="viewModels:LinkInfo">
-                    <Frame>
-                        <Frame.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootGroupVM}}, Path=OpenLinkInBrowserCommand}"
+    <Grid RowDefinitions="*, Auto">
+        <ScrollView>
+            <VerticalStackLayout Margin="10">
+                <!-- Hot Links -->
+                <CollectionView ItemsSource="{Binding Links}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="viewModels:LinkInfo">
+                            <Frame>
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootGroupVM}}, Path=OpenLinkInBrowserCommand}"
                                                   CommandParameter="{Binding .}"/>
-                        </Frame.GestureRecognizers>
+                                </Frame.GestureRecognizers>
 
-                        <Grid ColumnDefinitions="22, *, 40, 40, 40" ColumnSpacing="8"
+                                <Grid ColumnDefinitions="22, *, 40, 40, 40" ColumnSpacing="8"
                               HeightRequest="40">
-                            <Image VerticalOptions="Center" Aspect="Center">
-                                <Image.Source>
-                                    <FontImageSource Glyph="&#xf0c1;" FontFamily="FAFreeSolid" Size="20" Color="Orange"/>
-                                </Image.Source>
-                            </Image>
+                                    <Image VerticalOptions="Center" Aspect="Center" Source="link.png"/>
 
-                            <Label Grid.Column="1" Text="{Binding Name}" LineBreakMode="TailTruncation" VerticalOptions="Center" TextColor="White"/>
+                                    <Label Grid.Column="1" Text="{Binding Name}" LineBreakMode="TailTruncation" VerticalOptions="Center" TextColor="White"/>
 
-                            <Button Grid.Column="2" Text="edit" Style="{StaticResource IconBtnFreeSolid}"
+                                    <Button Grid.Column="2" Text="edit" Style="{StaticResource IconBtnFreeSolid}"
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootGroupVM}}, Path=EditLinkCommand}"
                                     CommandParameter="{Binding .}"/>
-                            <Button Grid.Column="3" Text="remove" Style="{StaticResource IconBtnFreeSolid}"
+                                    <Button Grid.Column="3" Text="remove" Style="{StaticResource IconBtnFreeSolid}"
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootGroupVM}}, Path=RemoveLinkCommand}"
                                     CommandParameter="{Binding .}"/>
-                            <Button Grid.Column="4" Text="star" Style="{StaticResource IconBtnFreeRegular}"
+                                    <Button Grid.Column="4" Text="star" Style="{StaticResource IconBtnFreeRegular}"
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootGroupVM}}, Path=RemoveMarkLinkAsFavoriteCommand}"
                                     CommandParameter="{Binding .}"/>
-                        </Grid>
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-        <!-- Groups List -->
-        <CollectionView Grid.Row="1" ItemsSource="{Binding Groups}" ItemSizingStrategy="MeasureAllItems">
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="viewModels:GroupInfo">
-                    <controls:LinksGroup Group="{Binding .}"
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+                <!-- Groups List -->
+                <CollectionView ItemsSource="{Binding Groups}" ItemSizingStrategy="MeasureAllItems">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="viewModels:GroupInfo">
+                            <controls:LinksGroup Group="{Binding .}"
                                          OpenCommand="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootGroupVM}}, Path=OpenGroupCommand}"
                                          ChangeNameCommand="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootGroupVM}}, Path=ChangeGroupNameCommand}"
                                          RemoveCommand="{Binding Source={RelativeSource AncestorType={x:Type viewModels:RootGroupVM}}, Path=RemoveGroupCommand}"/>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-        <!-- Group Add Form -->
-        <Button Grid.Row="2" Text="Add Group" Command="{Binding AddGroupCommand}"/>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid Grid.Row="2" Margin="10">
+            <Button Text="Add Group" Command="{Binding AddGroupCommand}"/>
+        </Grid>
     </Grid>
 
 </ContentPage>

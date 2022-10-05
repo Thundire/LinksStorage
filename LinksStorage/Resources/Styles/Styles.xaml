@@ -4,24 +4,23 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <Style x:Key="TextShadow" TargetType="Shadow">
-        <Setter Property="Radius" Value="4" />
-        <Setter Property="Opacity" Value="1" />
-        <Setter Property="Brush" Value="{StaticResource Gray400Brush}" />
-        <Setter Property="Offset" Value="0,4" />
-    </Style>
-
-    <Style x:Key="ItemShadow" TargetType="Shadow">
-        <Setter Property="Radius" Value="12" />
-        <Setter Property="Opacity" Value="1" />
-        <Setter Property="Brush" Value="{StaticResource Gray400Brush}" />
-        <Setter Property="Offset" Value="2,3" />
-    </Style>
+    <Shadow x:Key="TextShadow" Radius="4" Brush="{StaticResource Gray400Brush}" Offset="0,4"/>
+    <Shadow x:Key="ItemShadow" Radius="6" Brush="{StaticResource Gray400Brush}" Offset="3,4"/>
 
     <Style TargetType="Border">
-        <Setter Property="Stroke" Value="{StaticResource AccentBrush}" />
+        <Setter Property="BackgroundColor" Value="{StaticResource Gray300}" />
+        <Setter Property="StrokeThickness" Value="2"/>
+        <Setter Property="Stroke" Value="{StaticResource AccentBrush}"/>
         <Setter Property="StrokeShape" Value="Rectangle"/>
-        <Setter Property="StrokeThickness" Value="1"/>
+        <Setter Property="Margin" Value="0,0,0,5"/>
+    </Style>
+
+    <Style TargetType="CollectionView">
+        <Setter Property="Shadow" Value="{StaticResource ItemShadow}" />
+    </Style>
+
+    <Style TargetType="Frame">
+        <Setter Property="BackgroundColor" Value="Transparent" />
     </Style>
 
     <Style TargetType="Button">
@@ -32,6 +31,8 @@
         <Setter Property="FontAttributes" Value="Bold"/>
         <Setter Property="CornerRadius" Value="10"/>
         <Setter Property="Padding" Value="14,10"/>
+        <Setter Property="BorderColor" Value="{StaticResource Accent}"/>
+        <Setter Property="BorderWidth" Value="2"/>
         <Setter Property="Shadow" Value="{StaticResource ItemShadow}"/>
         <Setter Property="VisualStateManager.VisualStateGroups">
             <VisualStateGroupList>
@@ -68,17 +69,12 @@
         </Setter>
     </Style>
 
-    <Style TargetType="Frame">
-        <Setter Property="HasShadow" Value="False" />
-        <Setter Property="BorderColor" Value="{StaticResource Accent}" />
-        <Setter Property="CornerRadius" Value="8" />
-    </Style>
-
     <Style TargetType="ImageButton">
-        <Setter Property="Opacity" Value="1" />
-        <Setter Property="BorderColor" Value="Transparent"/>
-        <Setter Property="BorderWidth" Value="0"/>
-        <Setter Property="CornerRadius" Value="0"/>
+        <Setter Property="BackgroundColor" Value="{StaticResource Gray300}"/>
+        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="Shadow" Value="{StaticResource ItemShadow}"/>
+        <Setter Property="BorderColor" Value="{StaticResource Accent}"/>
+        <Setter Property="BorderWidth" Value="2"/>
         <Setter Property="VisualStateManager.VisualStateGroups">
             <VisualStateGroupList>
                 <VisualStateGroup x:Name="CommonStates">

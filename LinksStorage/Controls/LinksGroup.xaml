@@ -2,11 +2,12 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:LinksStorage.Controls"
+             xmlns:resources="clr-namespace:LinksStorage.Resources"
              x:Class="LinksStorage.Controls.LinksGroup"
              x:DataType="controls:LinksGroup">
     <ContentView.ControlTemplate>
         <ControlTemplate>
-            <Frame Padding="6" BackgroundColor="Black">
+            <Frame Padding="6" BackgroundColor="{StaticResource Gray300}">
                 <Frame.GestureRecognizers>
                     <TapGestureRecognizer Command="{TemplateBinding OpenCommand}"
                                           CommandParameter="{TemplateBinding Group.Id}"/>
@@ -14,11 +15,7 @@
 
                 <Grid ColumnDefinitions="22, *, 40, 40" ColumnSpacing="8"
                       HeightRequest="40">
-                    <Image VerticalOptions="Center" Aspect="Center">
-                        <Image.Source>
-                            <FontImageSource Glyph="&#xf07c;" FontFamily="FAFreeSolid" Size="20" Color="Green"/>
-                        </Image.Source>
-                    </Image>
+                    <Image VerticalOptions="Center" Aspect="Center" Source="group.png"/>
 
                     <Label Grid.Column="1" Text="{TemplateBinding Group.Name}" LineBreakMode="TailTruncation" VerticalOptions="Center" TextColor="White"/>
 
