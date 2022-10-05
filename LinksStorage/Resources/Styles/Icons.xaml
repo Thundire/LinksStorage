@@ -1,13 +1,44 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                     xmlns:resources="clr-namespace:LinksStorage.Resources">
-
-    <FontImageSource x:Key="LinkIcon" Glyph="{x:Static resources:SolidIcons.Link}" Color="{StaticResource Gray100}" Size="20" FontFamily="{x:Static resources:FontFamilies.Solid}"/>
-    <FontImageSource x:Key="GroupIcon" Glyph="{x:Static resources:SolidIcons.Group}" Color="{StaticResource Gray100}" Size="20" FontFamily="{x:Static resources:FontFamilies.Solid}"/>
-    <FontImageSource x:Key="DeleteIcon" Glyph="{x:Static resources:SolidIcons.Delete}" Color="{StaticResource Gray100}" Size="20" FontFamily="{x:Static resources:FontFamilies.Solid}"/>
-    <FontImageSource x:Key="EditIcon" Glyph="{x:Static resources:SolidIcons.Edit}" Color="{StaticResource Gray100}" Size="20" FontFamily="{x:Static resources:FontFamilies.Solid}"/>
-    <FontImageSource x:Key="FavoriteIcon" Glyph="{x:Static resources:SolidIcons.Star}" Color="{StaticResource Gray100}" Size="20" FontFamily="{x:Static resources:FontFamilies.Solid}"/>
-    <FontImageSource x:Key="NotFavoriteIcon" Glyph="{x:Static resources:RegularIcons.Star}" Color="{StaticResource Gray100}" Size="20" FontFamily="{x:Static resources:FontFamilies.Regular}"/>
-    <FontImageSource x:Key="BackIcon" Glyph="{x:Static resources:SolidIcons.Back}" Color="{StaticResource Gray100}" Size="20" FontFamily="{x:Static resources:FontFamilies.Solid}"/>
-    <FontImageSource x:Key="HomeIcon" Glyph="{x:Static resources:SolidIcons.House}" Color="{StaticResource Gray100}" Size="20" FontFamily="{x:Static resources:FontFamilies.Solid}"/>
+     <FontImageSource x:Key="LinkIcon"
+                     Glyph="{x:Static resources:SolidIcons.Link}"
+                     FontFamily="{x:Static resources:FontFamilies.Solid}"
+                     Color="{StaticResource Gray100}"
+                     />
+    <FontImageSource x:Key="GroupIcon"
+                     Glyph="{x:Static resources:SolidIcons.Group}"
+                     FontFamily="{x:Static resources:FontFamilies.Solid}"
+                     Color="{StaticResource Gray100}"
+                     />
+    <FontImageSource x:Key="DeleteIcon"
+                     Glyph="{x:Static resources:SolidIcons.Delete}"
+                     FontFamily="{x:Static resources:FontFamilies.Solid}"
+                     Color="{StaticResource Gray100}"
+                     />
+    <FontImageSource x:Key="EditIcon"
+                     Glyph="{x:Static resources:SolidIcons.Edit}"
+                     FontFamily="{x:Static resources:FontFamilies.Solid}"
+                     Color="{StaticResource Gray100}"
+                     />
+    <FontImageSource x:Key="FavoriteIcon"
+                     Glyph="{x:Static resources:SolidIcons.Star}"
+                     FontFamily="{x:Static resources:FontFamilies.Solid}"
+                     Color="{StaticResource Gray100}"
+                     />
+    <FontImageSource x:Key="NotFavoriteIcon"
+                     Glyph="{x:Static resources:RegularIcons.Star}"
+                     FontFamily="{x:Static resources:FontFamilies.Regular}"
+                     Color="{StaticResource Gray100}"
+                     />
+    <FontImageSource x:Key="BackIcon"
+                     Glyph="{x:Static resources:SolidIcons.Back}"
+                     FontFamily="{x:Static resources:FontFamilies.Solid}"
+                     Color="{StaticResource Gray100}"
+                     />
+    <FontImageSource x:Key="HomeIcon"
+                     Glyph="{x:Static resources:SolidIcons.House}"
+                     FontFamily="{x:Static resources:FontFamilies.Solid}"
+                     Color="{StaticResource Gray100}"  
+                     />
 </ResourceDictionary>
