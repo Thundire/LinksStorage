@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LinksStorage.Controls.GroupView">
+    <ContentView.ControlTemplate>
+        <ControlTemplate>
+            <Border>
+                <Frame Padding="5" BackgroundColor="{StaticResource Gray300}">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Command="{TemplateBinding OpenCommand}"
+                                              CommandParameter="{TemplateBinding Group.Id}"/>
+                    </Frame.GestureRecognizers>
+
+                    <Grid ColumnDefinitions="40, *, 40,40" ColumnSpacing="5" HeightRequest="40">
+                        <Image VerticalOptions="Center" Aspect="Center" Source="{StaticResource GroupIcon}"/>
+
+                        <Label Grid.Column="1" Text="{TemplateBinding Group.Name}"/>
+
+                        <ImageButton Grid.Column="2"
+                                     Source="{StaticResource EditIcon}"
+                                     Command="{TemplateBinding ChangeNameCommand}"
+                                     CommandParameter="{TemplateBinding Group}"/>
+                        <ImageButton Grid.Column="3"
+                                     Source="{StaticResource DeleteIcon}"
+                                     Command="{TemplateBinding RemoveCommand}"
+                                     CommandParameter="{TemplateBinding Group}"/>
+                    </Grid>
+                </Frame>
+            </Border>
+        </ControlTemplate>
+    </ContentView.ControlTemplate>
+</ContentView>
