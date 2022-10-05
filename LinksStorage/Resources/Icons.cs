@@ -15,3 +15,10 @@ public static class RegularIcons
 {
     public const string Star = "\u2b50";
 }
+
+public static class FontFamilies
+{
+    public const string Regular = nameof(Regular);
+    public const string Solid = nameof(Solid);
+    public const string Brand = nameof(Brand);
+}
