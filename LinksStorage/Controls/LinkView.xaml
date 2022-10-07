@@ -2,39 +2,40 @@
 
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:LinksStorage.Controls"
              x:Class="LinksStorage.Controls.LinkView">
     <ContentView.ControlTemplate>
         <ControlTemplate >
-            <Border>
-                <Frame Padding="5">
-                    <Frame.GestureRecognizers>
-                        <TapGestureRecognizer Command="{TemplateBinding OpenInBrowserCommand}"
-                                              CommandParameter="{TemplateBinding Link}"/>
-                    </Frame.GestureRecognizers>
+            <Border Style="{StaticResource ItemBorder}">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{TemplateBinding OpenInBrowserCommand}"
+                                          CommandParameter="{TemplateBinding Link}"/>
+                </Border.GestureRecognizers>
 
-                    <Grid ColumnDefinitions="40, *, 40, 40, 40, 40" ColumnSpacing="8" HeightRequest="40">
-                        <Image VerticalOptions="Center" Aspect="Center" Source="{StaticResource LinkIcon}"/>
+                <Grid ColumnDefinitions="30, *, Auto" ColumnSpacing="5" HeightRequest="45">
+                    <Image VerticalOptions="Center" Aspect="Center" Source="{StaticResource LinkIcon}"/>
 
-                        <Label Grid.Column="1" Text="{TemplateBinding Link.Name}"/>
+                    <Label Grid.Column="1" Text="{TemplateBinding Link.Name}"/>
 
-                        <ImageButton Grid.Column="2"
-                                     Source="{StaticResource EditIcon}"
-                                     Command="{TemplateBinding EditCommand}"
-                                     CommandParameter="{TemplateBinding Link}"/>
-                        <ImageButton Grid.Column="3"
-                                     Source="{StaticResource DeleteIcon}"
-                                     Command="{TemplateBinding RemoveCommand}"
-                                     CommandParameter="{TemplateBinding Link}"/>
-                        <ImageButton Grid.Column="4"
-                                     Source="{StaticResource FavoriteIcon}"
-                                     Command="{TemplateBinding MarkAsFavoriteCommand}"
-                                     CommandParameter="{TemplateBinding Link}"/>
-                        <ImageButton Grid.Column="5"
-                                     Source="{StaticResource NotFavoriteIcon}"
-                                     Command="{TemplateBinding RemoveMarkAsFavoriteCommand}"
-                                     CommandParameter="{TemplateBinding Link}"/>
-                    </Grid>
-                </Frame>
+                    <HorizontalStackLayout Grid.Column="2" Spacing="4">
+                        <controls:IconButton
+                                                 Glyph="{StaticResource EditIcon}"
+                                                 Command="{TemplateBinding EditCommand}"
+                                                 CommandParameter="{TemplateBinding Link}"/>
+                        <controls:IconButton
+                                                 Glyph="{StaticResource DeleteIcon}"
+                                                 Command="{TemplateBinding RemoveCommand}"
+                                                 CommandParameter="{TemplateBinding Link}"/>
+                        <controls:IconButton
+                                                 Glyph="{StaticResource FavoriteIcon}"
+                                                 Command="{TemplateBinding MarkAsFavoriteCommand}"
+                                                 CommandParameter="{TemplateBinding Link}"/>
+                        <controls:IconButton
+                                                 Glyph="{StaticResource NotFavoriteIcon}"
+                                                 Command="{TemplateBinding RemoveMarkAsFavoriteCommand}"
+                                                 CommandParameter="{TemplateBinding Link}"/>
+                    </HorizontalStackLayout>
+                </Grid>
             </Border>
         </ControlTemplate>
     </ContentView.ControlTemplate>

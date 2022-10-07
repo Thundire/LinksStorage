@@ -4,12 +4,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="LinksStorage.Controls.IconButton"
              x:Name="This">
-    <Border BindingContext="{Binding Source={x:Reference This}}" Shadow="{StaticResource ItemShadow}" StrokeShape="RoundRectangle 10">
-        <Frame Padding="4">
-            <Frame.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding Command}" CommandParameter="{Binding CommandParameter}"/>
-            </Frame.GestureRecognizers>
-            <Image VerticalOptions="Center" Aspect="Center" Source="{Binding Glyph}"/>
-        </Frame>
+    <Border BindingContext="{Binding Source={x:Reference This}}">
+        <Border.GestureRecognizers>
+            <TapGestureRecognizer Command="{Binding Command}" CommandParameter="{Binding CommandParameter}"/>
+        </Border.GestureRecognizers>
+        <Image VerticalOptions="Center" Aspect="Center" Source="{Binding Glyph}" Shadow="{StaticResource ItemShadow}"/>
     </Border>
 </ContentView>
