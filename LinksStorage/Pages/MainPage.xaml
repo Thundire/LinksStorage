@@ -5,9 +5,13 @@
              xmlns:controls="clr-namespace:LinksStorage.Controls"
              x:Class="LinksStorage.Pages.MainPage"
              x:DataType="viewModels:RootGroupVM">
+    <Grid RowDefinitions="50, *, Auto">
+        <!-- Nav Bar -->
+        <Border BackgroundColor="{StaticResource Accent}" StrokeThickness="0">
+            <Label Text="Home" FontAttributes="Bold" FontSize="20" VerticalOptions="Center" Margin="10,0,10,0"/>
+        </Border>
 
-    <Grid RowDefinitions="*, Auto">
-        <ScrollView>
+        <ScrollView Grid.Row="1">
             <VerticalStackLayout Margin="10">
                 <!-- Hot Links -->
                 <CollectionView ItemsSource="{Binding Links}">

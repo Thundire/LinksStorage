@@ -6,8 +6,17 @@
              xmlns:controls="clr-namespace:LinksStorage.Controls"
              x:Class="LinksStorage.Pages.GroupPage"
              x:DataType="viewModels:GroupVM">
-    <Grid RowDefinitions="*, Auto">
-        <ScrollView>
+    <Grid RowDefinitions="50, *, Auto" IgnoreSafeArea="True">
+        <!-- Nav Bar -->
+        <Border BackgroundColor="{StaticResource Accent}" StrokeThickness="0">
+            <HorizontalStackLayout Spacing="4" VerticalOptions="Center" Margin="10,0,10,0">
+                <controls:IconButton Glyph="{StaticResource HomeIcon}" WidthRequest="30"/>
+                <controls:IconButton Glyph="{StaticResource BackIcon}" WidthRequest="30"/>
+                <Label Text="Group" FontAttributes="Bold" FontSize="20"/>
+            </HorizontalStackLayout>
+        </Border>
+
+        <ScrollView Grid.Row="1">
             <VerticalStackLayout Margin="10">
                 <!-- Groups List -->
                 <CollectionView ItemsSource="{Binding Groups}">
@@ -37,7 +46,7 @@
             </VerticalStackLayout>
         </ScrollView>
 
-        <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Grid.Row="1" Margin="10">
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Grid.Row="2" Margin="10">
             <Button Text="Add Group" Command="{Binding AddGroupCommand}"/>
             <Button Grid.Column="1" Text="Add Link" Command="{Binding AddLinkCommand}"/>
         </Grid>
