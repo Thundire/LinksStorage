@@ -12,7 +12,7 @@
                                           CommandParameter="{TemplateBinding Link}"/>
                 </Border.GestureRecognizers>
 
-                <Grid ColumnDefinitions="30, *, Auto" ColumnSpacing="5" HeightRequest="45">
+                <Grid ColumnDefinitions="30, *, Auto" ColumnSpacing="5" HeightRequest="40">
                     <Image VerticalOptions="Center" Aspect="Center" Source="{StaticResource LinkIcon}"/>
 
                     <Label Grid.Column="1" Text="{TemplateBinding Link.Name}"/>
