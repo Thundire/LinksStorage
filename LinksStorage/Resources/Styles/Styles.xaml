@@ -7,20 +7,17 @@
     <Shadow x:Key="TextShadow" Radius="4" Brush="{StaticResource Gray400Brush}" Offset="0,4"/>
     <Shadow x:Key="ItemShadow" Radius="6" Brush="{StaticResource Gray400Brush}" Offset="3,4"/>
 
-    <Style TargetType="Border">
+    <Style x:Key="ItemBorder" TargetType="Border">
         <Setter Property="BackgroundColor" Value="{StaticResource Gray300}" />
         <Setter Property="StrokeThickness" Value="2"/>
         <Setter Property="Stroke" Value="{StaticResource AccentBrush}"/>
         <Setter Property="StrokeShape" Value="Rectangle"/>
         <Setter Property="Margin" Value="0,0,0,5"/>
+        <Setter Property="Padding" Value="4,2"/>
     </Style>
 
     <Style TargetType="CollectionView">
         <Setter Property="Shadow" Value="{StaticResource ItemShadow}" />
-    </Style>
-
-    <Style TargetType="Frame">
-        <Setter Property="BackgroundColor" Value="Transparent" />
     </Style>
 
     <Style TargetType="Button">
@@ -62,26 +59,6 @@
                     <VisualState x:Name="Disabled">
                         <VisualState.Setters>
                             <Setter Property="TextColor" Value="{StaticResource Gray100}" />
-                        </VisualState.Setters>
-                    </VisualState>
-                </VisualStateGroup>
-            </VisualStateGroupList>
-        </Setter>
-    </Style>
-
-    <Style TargetType="ImageButton">
-        <Setter Property="BackgroundColor" Value="{StaticResource Gray300}"/>
-        <Setter Property="CornerRadius" Value="10"/>
-        <Setter Property="Shadow" Value="{StaticResource ItemShadow}"/>
-        <Setter Property="BorderColor" Value="{StaticResource Accent}"/>
-        <Setter Property="BorderWidth" Value="2"/>
-        <Setter Property="VisualStateManager.VisualStateGroups">
-            <VisualStateGroupList>
-                <VisualStateGroup x:Name="CommonStates">
-                    <VisualState x:Name="Normal" />
-                    <VisualState x:Name="Disabled">
-                        <VisualState.Setters>
-                            <Setter Property="Opacity" Value="0.5" />
                         </VisualState.Setters>
                     </VisualState>
                 </VisualStateGroup>
@@ -144,7 +121,7 @@
     <Style TargetType="Shell" ApplyToDerivedTypes="True">
         <Setter Property="Shell.BackgroundColor" Value="{StaticResource Gray300}" />
         <Setter Property="Shell.ForegroundColor" Value="{StaticResource White}" />
-        <Setter Property="Shell.TitleColor" Value="{StaticResource White}" />
+        <Setter Property="Shell.TitleColor" Value="{StaticResource Accent}" />
         <Setter Property="Shell.DisabledColor" Value="{StaticResource Gray100}" />
         <Setter Property="Shell.UnselectedColor" Value="{StaticResource Gray100}" />
         <Setter Property="Shell.NavBarHasShadow" Value="False" />
