@@ -4,41 +4,41 @@
      <FontImageSource x:Key="LinkIcon"
                      Glyph="{x:Static resources:SolidIcons.Link}"
                      FontFamily="{x:Static resources:FontFamilies.Solid}"
-                     Color="{StaticResource Gray100}"
+                     Color="{StaticResource Gray100}" Size="20"
                      />
     <FontImageSource x:Key="GroupIcon"
                      Glyph="{x:Static resources:SolidIcons.Group}"
                      FontFamily="{x:Static resources:FontFamilies.Solid}"
-                     Color="{StaticResource Gray100}"
+                     Color="{StaticResource Gray100}" Size="20"
                      />
     <FontImageSource x:Key="DeleteIcon"
                      Glyph="{x:Static resources:SolidIcons.Delete}"
                      FontFamily="{x:Static resources:FontFamilies.Solid}"
-                     Color="{StaticResource Gray100}"
+                     Color="{StaticResource Gray100}" Size="20"
                      />
     <FontImageSource x:Key="EditIcon"
                      Glyph="{x:Static resources:SolidIcons.Edit}"
                      FontFamily="{x:Static resources:FontFamilies.Solid}"
-                     Color="{StaticResource Gray100}"
+                     Color="{StaticResource Gray100}" Size="20"
                      />
     <FontImageSource x:Key="FavoriteIcon"
                      Glyph="{x:Static resources:SolidIcons.Star}"
                      FontFamily="{x:Static resources:FontFamilies.Solid}"
-                     Color="{StaticResource Gray100}"
+                     Color="{StaticResource Gray100}" Size="20"
                      />
     <FontImageSource x:Key="NotFavoriteIcon"
                      Glyph="{x:Static resources:RegularIcons.Star}"
                      FontFamily="{x:Static resources:FontFamilies.Regular}"
-                     Color="{StaticResource Gray100}"
+                     Color="{StaticResource Gray100}" Size="20"
                      />
     <FontImageSource x:Key="BackIcon"
                      Glyph="{x:Static resources:SolidIcons.Back}"
                      FontFamily="{x:Static resources:FontFamilies.Solid}"
-                     Color="{StaticResource Gray100}"
+                     Color="{StaticResource Gray100}" Size="20"
                      />
     <FontImageSource x:Key="HomeIcon"
                      Glyph="{x:Static resources:SolidIcons.House}"
                      FontFamily="{x:Static resources:FontFamilies.Solid}"
-                     Color="{StaticResource Gray100}"  
+                     Color="{StaticResource Gray100}" Size="20"  
                      />
 </ResourceDictionary>
