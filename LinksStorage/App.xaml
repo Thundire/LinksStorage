@@ -7,21 +7,9 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
+                <ResourceDictionary Source="Resources/Styles/Icons.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
-
-            <Style x:Key="IconButtonDefaultStyle" TargetType="Button">
-                <Setter Property="FontSize" Value="18"/>
-                <Setter Property="Padding" Value="2"/>
-            </Style>
-
-            <Style x:Key="IconBtnFreeSolid" TargetType="Button" BasedOn="{StaticResource IconButtonDefaultStyle}">
-                <Setter Property="FontFamily" Value="FAFreeSolid" />
-            </Style>
-
-            <Style x:Key="IconBtnFreeRegular" TargetType="Button" BasedOn="{StaticResource IconButtonDefaultStyle}">
-                <Setter Property="FontFamily" Value="FAFreeRegular" />
-            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
