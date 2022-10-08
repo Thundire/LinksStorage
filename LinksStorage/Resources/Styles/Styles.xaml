@@ -124,17 +124,12 @@
         <Setter Property="BackgroundColor" Value="{StaticResource Gray300}" />
     </Style>
 
-    <Style TargetType="Shell" ApplyToDerivedTypes="True">
-        <Setter Property="Shell.BackgroundColor" Value="{StaticResource Gray300}" />
-        <Setter Property="Shell.ForegroundColor" Value="{StaticResource White}" />
-        <Setter Property="Shell.TitleColor" Value="{StaticResource Accent}" />
-        <Setter Property="Shell.DisabledColor" Value="{StaticResource Gray100}" />
-        <Setter Property="Shell.UnselectedColor" Value="{StaticResource Gray100}" />
-        <Setter Property="Shell.NavBarHasShadow" Value="False" />
-        <Setter Property="Shell.TabBarBackgroundColor" Value="{StaticResource Gray300}" />
-        <Setter Property="Shell.TabBarForegroundColor" Value="{StaticResource White}" />
-        <Setter Property="Shell.TabBarTitleColor" Value="{StaticResource White}" />
-        <Setter Property="Shell.TabBarUnselectedColor" Value="{StaticResource Gray100}" />
+    <Style TargetType="ContentPage" ApplyToDerivedTypes="True">
+        <Setter Property="NavigationPage.HasNavigationBar" Value="False" />
+        <Setter Property="BackgroundColor" Value="{StaticResource Gray300}"/>
+        <Setter Property="Shell.BackButtonBehavior">
+            <Setter.Value><BackButtonBehavior IsVisible="False"/></Setter.Value>
+        </Setter>
     </Style>
 
 </ResourceDictionary>
