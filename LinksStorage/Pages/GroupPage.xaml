@@ -10,8 +10,8 @@
         <!-- Nav Bar -->
         <Border BackgroundColor="{StaticResource Accent}" StrokeThickness="0">
             <HorizontalStackLayout Spacing="4" VerticalOptions="Center" Margin="10,0,10,0">
-                <controls:IconButton x:Name="HomeBtn" Glyph="{StaticResource HomeIcon}" WidthRequest="30" Tapped="NavigateToHome"/>
-                <controls:IconButton x:Name="BackBtn" Glyph="{StaticResource BackIcon}" WidthRequest="30" Tapped="NavigateBack"/>
+                <controls:IconButton Glyph="{StaticResource HomeIcon}" WidthRequest="30" Tapped="NavigateToHome" IsVisible="{Binding IsNotFromRoot}"/>
+                <controls:IconButton Glyph="{StaticResource BackIcon}" WidthRequest="30" Tapped="NavigateBack"/>
                 <Label Text="{Binding GroupName}" FontAttributes="Bold" FontSize="20"/>
             </HorizontalStackLayout>
         </Border>

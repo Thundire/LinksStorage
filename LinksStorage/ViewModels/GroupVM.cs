@@ -7,6 +7,7 @@ namespace LinksStorage.ViewModels;
 
 [QueryProperty(nameof(GroupId), "groupId")]
 [QueryProperty(nameof(GroupName), "groupName")]
+[QueryProperty(nameof(IsNotFromRoot), "notFromRoot")]
 public sealed partial class GroupVM : RootGroupVM
 {
     public GroupVM(

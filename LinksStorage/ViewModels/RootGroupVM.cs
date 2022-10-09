@@ -17,6 +17,7 @@ public partial class RootGroupVM : ObservableObject, IDisposable
     public int GroupId { get; set; }
 
     [ObservableProperty] private string _groupName;
+    [ObservableProperty] private bool _isNotFromRoot;
     [ObservableProperty] private ObservableCollection<LinkInfo> _links;
     [ObservableProperty] private ObservableCollection<GroupInfo> _groups;
 
@@ -65,10 +66,11 @@ public partial class RootGroupVM : ObservableObject, IDisposable
     [RelayCommand]
     private async Task OpenGroup(GroupInfo group)
     {
-        await Shell.Current.GoToAsync(NavigationRoutes.Group, new Dictionary<string, object>()
+        await Shell.Current.GoToAsync(NavigationRoutes.Group, new Dictionary<string, object>
         {
             ["groupId"] = group.Id,
-            ["groupName"] = group.Name
+            ["groupName"] = group.Name,
+            ["notFromRoot"] = GroupId != 1
         });
     }
 
