@@ -5,15 +5,18 @@ namespace LinksStorage.Data.TablesProtoModels;
 [Table("links")]
 public class Link
 {
-    [PrimaryKey, AutoIncrement]
+    [PrimaryKey, AutoIncrement, Column("id")]
     public int Id { get; set; }
 
-    [Indexed]
+    [Indexed, Column("name")]
     public string Name { get; set; }
 
-    [MaxLength(2050)]
+    [MaxLength(2050), Column("url")]
     public string Url { get; set; }
 
-    [Indexed]
+    [Indexed, Column("group_id")]
     public int GroupId { get; set; }
+
+    [Indexed,Column("favorite")] 
+    public bool IsFavorite { get; set; }
 }

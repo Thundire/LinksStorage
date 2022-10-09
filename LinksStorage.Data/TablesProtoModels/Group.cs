@@ -5,11 +5,12 @@ namespace LinksStorage.Data.TablesProtoModels;
 [Table("groups")]
 public class Group
 {
-    [PrimaryKey, AutoIncrement]
+    [PrimaryKey, AutoIncrement, Column("id")]
     public int Id { get; set; }
 
-    [Indexed]
+    [Indexed, Column("name")]
     public string Name { get; set; }
 
+    [Column("group_id")]
     public int GroupId { get; set; }
 }
