@@ -5,3 +5,4 @@
 .vs/
 
 # Extended
+/LinksStorage.Data.Test/Properties/launchSettings.json
