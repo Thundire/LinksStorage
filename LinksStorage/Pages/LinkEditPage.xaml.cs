@@ -9,4 +9,9 @@ public partial class LinkEditPage : ContentPage
         InitializeComponent();
         BindingContext = vm;
     }
+
+    private async void Back(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("..");
+    }
 }

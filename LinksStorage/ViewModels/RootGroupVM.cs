@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -15,6 +16,8 @@ public partial class RootGroupVM : ObservableObject, IDisposable
     protected static readonly object SenderMark = new();
     public int GroupId { get; set; }
 
+    [ObservableProperty] private string _groupName;
+    [ObservableProperty] private bool _isNotFromRoot;
     [ObservableProperty] private ObservableCollection<LinkInfo> _links;
     [ObservableProperty] private ObservableCollection<GroupInfo> _groups;
 
@@ -24,6 +27,7 @@ public partial class RootGroupVM : ObservableObject, IDisposable
         BrowserLauncherService browserLauncherService)
     {
         GroupId = 1;
+        GroupName = "Home";
 
         _messenger = messenger;
         _scopeFactory = scopeFactory;
@@ -47,8 +51,8 @@ public partial class RootGroupVM : ObservableObject, IDisposable
         var storage = await scope.ServiceProvider.GetRequiredService<Storage>().Initialize();
         var rootData = await GetGroupData(GroupId, storage);
 
-        Links = new(rootData.Links.Select(x=> new LinkInfo(x)));
-        Groups = new(rootData.Groups.Select(x=> new GroupInfo(x)));
+        Links = new(rootData.Links.Select(x => new LinkInfo(x) { IsFavorite = x.IsFavorite }));
+        Groups = new(rootData.Groups.Select(x => new GroupInfo(x)));
     }
 
     [RelayCommand]
@@ -60,11 +64,13 @@ public partial class RootGroupVM : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    private async Task OpenGroup(int groupId)
+    private async Task OpenGroup(GroupInfo group)
     {
-        await Shell.Current.GoToAsync(NavigationRoutes.Group, new Dictionary<string, object>()
+        await Shell.Current.GoToAsync(NavigationRoutes.Group, new Dictionary<string, object>
         {
-            ["group"] = groupId
+            ["groupId"] = group.Id,
+            ["groupName"] = group.Name,
+            ["notFromRoot"] = GroupId != 1
         });
     }
 
@@ -117,7 +123,7 @@ public partial class RootGroupVM : ObservableObject, IDisposable
 
     private void RemoveGroup(DataPersistenceOutbox _, RemovedGroup args)
     {
-        Refresh().Wait();
+        Refresh();
     }
 
     private void RemoveLink(DataPersistenceOutbox _, RemovedLink args)
@@ -134,7 +140,7 @@ public partial class RootGroupVM : ObservableObject, IDisposable
 
     protected virtual void MarkLinkAsFavorite(DataPersistenceOutbox _, MarkedLinkAsFavorite args)
     {
-        Links.Add(new() { Id = args.Id, Name = args.Name, Url = args.Url });
+        Links.Add(new() { Id = args.Id, Name = args.Name, Url = args.Url, IsFavorite = true });
     }
 
     private void UpdateLink(DataPersistenceOutbox _, EditLink args)

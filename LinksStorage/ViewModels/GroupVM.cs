@@ -1,10 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+
 using LinksStorage.Data;
 using LinksStorage.Services;
 
 namespace LinksStorage.ViewModels;
 
-[QueryProperty(nameof(GroupId), "group")]
+[QueryProperty(nameof(GroupId), "groupId")]
+[QueryProperty(nameof(GroupName), "groupName")]
+[QueryProperty(nameof(IsNotFromRoot), "notFromRoot")]
 public sealed partial class GroupVM : RootGroupVM
 {
     public GroupVM(
@@ -34,13 +37,13 @@ public sealed partial class GroupVM : RootGroupVM
 
     private void AddLink(DataPersistenceOutbox _, CreatedLink args)
     {
-        if(args.GroupId != GroupId) return;
-        Links.Add(new(){Id = args.Id, Name = args.Name, Url = args.Url});
+        if (args.GroupId != GroupId) return;
+        Links.Add(new() { Id = args.Id, Name = args.Name, Url = args.Url });
     }
 
     protected override void MarkLinkAsFavorite(DataPersistenceOutbox _, MarkedLinkAsFavorite args)
     {
-        if(Links.FirstOrDefault(x=>x.Id == args.Id) is not {} entry) return;
+        if (Links.FirstOrDefault(x => x.Id == args.Id) is not { } entry) return;
         entry.IsFavorite = true;
     }
 

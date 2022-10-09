@@ -3,40 +3,37 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:LinksStorage.Controls"
-             x:Class="LinksStorage.Controls.LinkView">
-    <ContentView.ControlTemplate>
-        <ControlTemplate >
-            <Border Style="{StaticResource ItemBorder}">
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{TemplateBinding OpenInBrowserCommand}"
-                                          CommandParameter="{TemplateBinding Link}"/>
-                </Border.GestureRecognizers>
+             x:Class="LinksStorage.Controls.LinkView"
+             x:Name="This">
+    <Border Style="{StaticResource ItemBorder}" BindingContext="{Binding Source={x:Reference This}}">
+        <Border.GestureRecognizers>
+            <TapGestureRecognizer Command="{Binding OpenInBrowserCommand}"
+                                          CommandParameter="{Binding Link}"/>
+        </Border.GestureRecognizers>
 
-                <Grid ColumnDefinitions="30, *, Auto" ColumnSpacing="5" HeightRequest="40">
-                    <Image VerticalOptions="Center" Aspect="Center" Source="{StaticResource LinkIcon}"/>
+        <Grid ColumnDefinitions="30, *, Auto" ColumnSpacing="5" HeightRequest="40">
+            <Image VerticalOptions="Center" Aspect="Center" Source="{StaticResource LinkIcon}"/>
 
-                    <Label Grid.Column="1" Text="{TemplateBinding Link.Name}"/>
+            <Label Grid.Column="1" Text="{Binding Link.Name}"/>
 
-                    <HorizontalStackLayout Grid.Column="2" Spacing="4">
-                        <controls:IconButton
-                                                 Glyph="{StaticResource EditIcon}"
-                                                 Command="{TemplateBinding EditCommand}"
-                                                 CommandParameter="{TemplateBinding Link}"/>
-                        <controls:IconButton
-                                                 Glyph="{StaticResource DeleteIcon}"
-                                                 Command="{TemplateBinding RemoveCommand}"
-                                                 CommandParameter="{TemplateBinding Link}"/>
-                        <controls:IconButton
-                                                 Glyph="{StaticResource FavoriteIcon}"
-                                                 Command="{TemplateBinding MarkAsFavoriteCommand}"
-                                                 CommandParameter="{TemplateBinding Link}"/>
-                        <controls:IconButton
-                                                 Glyph="{StaticResource NotFavoriteIcon}"
-                                                 Command="{TemplateBinding RemoveMarkAsFavoriteCommand}"
-                                                 CommandParameter="{TemplateBinding Link}"/>
-                    </HorizontalStackLayout>
-                </Grid>
-            </Border>
-        </ControlTemplate>
-    </ContentView.ControlTemplate>
+            <HorizontalStackLayout Grid.Column="2" Spacing="4">
+                <controls:IconButton Glyph="{StaticResource EditIcon}"
+                                     Command="{Binding EditCommand}"
+                                     CommandParameter="{Binding Link}"/>
+                <controls:IconButton Glyph="{StaticResource DeleteIcon}"
+                                     Command="{Binding RemoveCommand}"
+                                     CommandParameter="{Binding Link}"/>
+                <controls:IconButton Glyph="{StaticResource FavoriteIcon}"
+                                     Command="{Binding MarkAsFavoriteCommand}"
+                                     CommandParameter="{Binding Link}">
+                    <controls:IconButton.Triggers>
+                        <DataTrigger TargetType="controls:IconButton"  Binding="{Binding Link.IsFavorite}" Value="True">
+                            <Setter Property="Glyph" Value="{StaticResource NotFavoriteIcon}"/>
+                            <Setter Property="Command" Value="{Binding RemoveMarkAsFavoriteCommand}"/>
+                        </DataTrigger>
+                    </controls:IconButton.Triggers>
+                </controls:IconButton>
+            </HorizontalStackLayout>
+        </Grid>
+    </Border>
 </ContentView>

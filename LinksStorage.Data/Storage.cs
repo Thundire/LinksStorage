@@ -1,4 +1,5 @@
 ﻿using LinksStorage.Data.TablesProtoModels;
+
 using SQLite;
 
 namespace LinksStorage.Data;
@@ -14,83 +15,77 @@ public class Storage
 
     public async Task<Storage> Initialize()
     {
-        await _connection.CreateTablesAsync<FavoriteLink, Group, Link>();
-        await _connection.ExecuteAsync("insert into groups(Name) select 'root' where not exists (select 1 from groups where Id = 1 and Name = 'root')");
+        await _connection.CreateTablesAsync<Group, Link>().ConfigureAwait(false);
+        await _connection.ExecuteAsync("insert into groups(name) select 'root' where not exists (select 1 from groups where id = 1 and name = 'root')");
         return this;
     }
 
     public async Task<int> AddGroup(string name, int parentGroupId)
     {
         Group group = new() { Name = name, GroupId = parentGroupId };
-        await _connection.InsertAsync(group);
+        await _connection.InsertAsync(group).ConfigureAwait(false);
         return group.Id;
     }
 
     public async Task<int> AddLink(string alias, string url, int parentGroupId)
     {
         Link link = new() { Name = alias, Url = url, GroupId = parentGroupId };
-        await _connection.InsertAsync(link);
+        await _connection.InsertAsync(link).ConfigureAwait(false);
         return link.Id;
     }
 
     public async Task UpdateLink(int id, string name, string url)
     {
-        await _connection.ExecuteAsync($"update links set Name = '{name}', Url = '{url}' where Id = {id}");
+        await _connection.ExecuteAsync($"update links set name = '{name}', url = '{url}' where id = {id}").ConfigureAwait(false);
     }
 
     public async Task<LinkInfoData> RegisterFavoriteLink(int linkId)
     {
         var link = await _connection.FindAsync<Link>(linkId);
-        FavoriteLink favorite = new() { LinkId = linkId, GroupId = link.GroupId };
-        await _connection.InsertAsync(favorite);
-        return new () { Id = linkId, Name = link.Name, Url = link.Url };
+        await _connection.ExecuteAsync("update links set favorite = 1 where id = ?", linkId).ConfigureAwait(false);
+        return new() { Id = linkId, Name = link.Name, Url = link.Url, IsFavorite = true };
     }
 
     public async Task<GroupData> GetRootPage()
     {
-        var hotLinks = await _connection.QueryAsync<LinkInfoData>("select l.Id, l.Name, l.Url from links as l inner join favorites as f on l.Id = f.LinkId");
-        var groups = await _connection.QueryAsync<GroupInfoData>("select Id, Name from groups where GroupId = 1");
+        var hotLinks = await _connection.QueryAsync<LinkInfoData>("select id, name, url, favorite from links where favorite = 1").ConfigureAwait(false);
+        var groups = await _connection.QueryAsync<GroupInfoData>("select id, name from groups where group_id = 1");
         return new(hotLinks, groups);
     }
 
     public async Task<GroupData> GetGroup(int groupId)
     {
-        var links = await _connection.QueryAsync<LinkInfoData>("select Id, Name, Url from links where GroupId = ?", groupId);
-        var groups = await _connection.QueryAsync<GroupInfoData>("select Id, Name from groups where GroupId = ?", groupId);
+        var links = await _connection.QueryAsync<LinkInfoData>("select id, name, url, favorite from links where group_id = ?", groupId).ConfigureAwait(false);
+        var groups = await _connection.QueryAsync<GroupInfoData>("select id, name from groups where group_id = ?", groupId);
         return new(links, groups);
     }
 
     public async Task ChangeGroupName(int groupId, string name)
     {
-        await _connection.ExecuteAsync($"update groups set name = '{name}' where id = {groupId}");
+        await _connection.ExecuteAsync($"update groups set name = '{name}' where id = {groupId}").ConfigureAwait(false);
     }
 
     public async Task RemoveLink(int id)
     {
-        await _connection.RunInTransactionAsync(c =>
-        {
-            c.Execute("delete from links where Id = ?", id);
-            c.Execute("delete from favorites where LinkId = ?", id);
-        });
+        await _connection.DeleteAsync<Link>(id).ConfigureAwait(false);
     }
 
     public async Task RemoveGroup(int id)
     {
         await _connection.RunInTransactionAsync(c =>
-        {
-            // delete group
-            c.Delete<Group>(id);
-            // delete groups that inside group
-            c.Execute("delete from groups where GroupId = ?", id);
-            // delete favorite links in group
-            c.Execute("delete from favorites where GroupId = ?", id);
-            // delete links in group
-            c.Execute("delete from links where GroupId = ?", id);
-        });
+       {
+           // delete group
+           c.Delete<Group>(id);
+           // delete groups that inside group
+           c.Execute("delete from groups where group_id = ?", id);
+           // delete links in group
+           c.Execute("delete from links where group_id = ?", id);
+       }).ConfigureAwait(false);
     }
 
     public async Task RemoveLinkFromFavorites(int id)
     {
-        await _connection.ExecuteAsync("delete from favorites where LinkId = ?", id);
+        var link = await _connection.FindAsync<Link>(id).ConfigureAwait(false);
+        await _connection.ExecuteAsync("update links set favorite = 0 where id = ?", id);
     }
 }

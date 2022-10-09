@@ -2,31 +2,26 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:LinksStorage.Controls"
-             x:Class="LinksStorage.Controls.GroupView">
-    <ContentView.ControlTemplate>
-        <ControlTemplate>
-            <Border Style="{StaticResource ItemBorder}">
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{TemplateBinding OpenCommand}"
-                                          CommandParameter="{TemplateBinding Group.Id}"/>
-                </Border.GestureRecognizers>
-                <Grid ColumnDefinitions="30, *,Auto" ColumnSpacing="5" HeightRequest="40">
-                    <Image VerticalOptions="Center" Aspect="Center" Source="{StaticResource GroupIcon}"/>
+             x:Class="LinksStorage.Controls.GroupView"
+             x:Name="This">
+    <Border Style="{StaticResource ItemBorder}" BindingContext="{Binding Source={x:Reference This}}">
+        <Border.GestureRecognizers>
+            <TapGestureRecognizer Command="{Binding OpenCommand}"
+                                  CommandParameter="{Binding Group}"/>
+        </Border.GestureRecognizers>
+        <Grid ColumnDefinitions="30, *,Auto" ColumnSpacing="5" HeightRequest="40">
+            <Image VerticalOptions="Center" Aspect="Center" Source="{StaticResource GroupIcon}"/>
 
-                    <Label Grid.Column="1" Text="{TemplateBinding Group.Name}"/>
+            <Label Grid.Column="1" Text="{Binding Group.Name}"/>
 
-                    <HorizontalStackLayout Grid.Column="2" Spacing="4">
-                        <controls:IconButton
-                                                 Glyph="{StaticResource EditIcon}"
-                                                 Command="{TemplateBinding ChangeNameCommand}"
-                                                 CommandParameter="{TemplateBinding Group}"/>
-                        <controls:IconButton
-                                                 Glyph="{StaticResource DeleteIcon}"
-                                                 Command="{TemplateBinding RemoveCommand}"
-                                                 CommandParameter="{TemplateBinding Group}"/>
-                    </HorizontalStackLayout>
-                </Grid>
-            </Border>
-        </ControlTemplate>
-    </ContentView.ControlTemplate>
+            <HorizontalStackLayout Grid.Column="2" Spacing="4">
+                <controls:IconButton Glyph="{StaticResource EditIcon}"
+                                     Command="{Binding ChangeNameCommand}"
+                                     CommandParameter="{Binding Group}"/>
+                <controls:IconButton Glyph="{StaticResource DeleteIcon}"
+                                     Command="{Binding RemoveCommand}"
+                                     CommandParameter="{Binding Group}"/>
+            </HorizontalStackLayout>
+        </Grid>
+    </Border>
 </ContentView>
