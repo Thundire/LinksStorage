@@ -8,7 +8,7 @@
             <Border Style="{StaticResource ItemBorder}">
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer Command="{TemplateBinding OpenCommand}"
-                                          CommandParameter="{TemplateBinding Group.Id}"/>
+                                          CommandParameter="{TemplateBinding Group}"/>
                 </Border.GestureRecognizers>
                 <Grid ColumnDefinitions="30, *,Auto" ColumnSpacing="5" HeightRequest="40">
                     <Image VerticalOptions="Center" Aspect="Center" Source="{StaticResource GroupIcon}"/>
