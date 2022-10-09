@@ -6,7 +6,7 @@
              x:Name="This">
     <Border BindingContext="{Binding Source={x:Reference This}}">
         <Border.GestureRecognizers>
-            <TapGestureRecognizer Command="{Binding Command}" CommandParameter="{Binding CommandParameter}"/>
+            <TapGestureRecognizer Command="{Binding Command}" CommandParameter="{Binding CommandParameter}" Tapped="OnTapped"/>
         </Border.GestureRecognizers>
         <Image VerticalOptions="Center" Aspect="Center" Source="{Binding Glyph}" Shadow="{StaticResource ItemShadow}"/>
     </Border>

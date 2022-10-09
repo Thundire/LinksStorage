@@ -26,4 +26,11 @@ public partial class IconButton : ContentView
         typeof(IconButton),
         default(ImageSource));
     public ImageSource Glyph { get => (ImageSource)GetValue(GlyphProperty); set => SetValue(GlyphProperty, value); }
+
+    public event EventHandler Tapped;
+
+    private void OnTapped(object sender, EventArgs e)
+    {
+        Tapped?.Invoke(sender, e);
+    }
 }
