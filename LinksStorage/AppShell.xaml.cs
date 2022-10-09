@@ -12,4 +12,18 @@ public partial class AppShell : Shell
         Routing.RegisterRoute(NavigationRoutes.Group, typeof(GroupPage));
         Routing.RegisterRoute(NavigationRoutes.LinkEditForm, typeof(LinkEditPage));
     }
+
+    public static async Task ToRoot()
+    {
+        var navigation = Shell.Current.Navigation;
+        while (navigation.ModalStack.Count > 0)
+        {
+            await navigation.PopModalAsync(false);
+        }
+
+        while (navigation.NavigationStack.Count > 1)
+        {
+            await navigation.PopAsync(false);
+        }
+    }
 }

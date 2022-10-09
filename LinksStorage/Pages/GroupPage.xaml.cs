@@ -17,4 +17,14 @@ public partial class GroupPage : ContentPage
         await VM.Refresh();
         base.OnNavigatedTo(args);
     }
+
+    private async void NavigateToHome(object sender, EventArgs e)
+    {
+       await AppShell.ToRoot();
+    }
+
+    private async void NavigateBack(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("..");
+    }
 }
