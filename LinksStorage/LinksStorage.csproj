@@ -27,6 +27,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <!-- App Package Sign Up -->
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <PackageCertificateThumbprint>10D30D1236FD7716996A902FA41724055A0ED025</PackageCertificateThumbprint>
