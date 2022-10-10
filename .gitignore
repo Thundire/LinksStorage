@@ -6,3 +6,5 @@
 
 # Extended
 /LinksStorage.Data.Test/Properties/launchSettings.json
+/LinksStorage/Properties/PublishProfiles/MSIX-win10-x64.pubxml
+/LinksStorage/LinksStorage_TemporaryKey.pfx
