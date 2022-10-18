@@ -9,6 +9,7 @@ public static class SolidIcons
     public const string Edit = "\uf304";
     public const string Back = "\u2329";
     public const string House = "\ue3af";
+    public const string More = "\uf142";
 }
 
 public static class RegularIcons
