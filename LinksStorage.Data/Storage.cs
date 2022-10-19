@@ -88,4 +88,17 @@ public class Storage
         var link = await _connection.FindAsync<Link>(id).ConfigureAwait(false);
         await _connection.ExecuteAsync("update links set favorite = 0 where id = ?", id);
     }
+
+    public async Task<JsonData> Export()
+    {
+        var links = await _connection.QueryAsync<JsonLink>("select name, url, group_id as GroupId, favorite as IsFavorite from links").ConfigureAwait(false);
+        var groups = await _connection.QueryAsync<JsonGroup>("select name, group_id as ParentGroupId from groups where group_id >= 1");
+        return new(links, groups);
+    }
+
+    public async Task Import(JsonData data)
+    {
+        await _connection.InsertAllAsync(data.Links.Select(x=>x.Map()), typeof(Link)).ConfigureAwait(false);
+        await _connection.InsertAllAsync(data.Groups.Select(x=>x.Map()), typeof(Group));
+    }
 }
