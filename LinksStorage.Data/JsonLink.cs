@@ -23,4 +23,6 @@ public class JsonLink
     public int GroupId { get; init; }
 
     public Link Map() => new() { Name = Name, Url = Url, GroupId = GroupId, IsFavorite = IsFavorite };
+
+    public override string ToString() => $"{(IsFavorite ? "*":"")}  {Name}: {Url} ..... {GroupId}";
 }

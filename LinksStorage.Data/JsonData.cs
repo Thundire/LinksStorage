@@ -10,4 +10,6 @@ public class JsonData
 
     public List<JsonGroup> Groups { get; init; }
     public List<JsonLink> Links { get; init; }
+
+    public override string ToString() => string.Join("\n", Groups) + "\n" + string.Join("\n", Links);
 }

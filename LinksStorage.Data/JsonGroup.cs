@@ -19,4 +19,6 @@ public class JsonGroup
     public int ParentGroupId { get; init; }
 
     public Group Map() => new() { GroupId = ParentGroupId, Name = Name };
+
+    public override string ToString() => $"{Name}, {ParentGroupId}";
 }
