@@ -40,8 +40,9 @@
             </VerticalStackLayout>
         </ScrollView>
 
-        <Grid Grid.Row="2" Margin="10">
+        <Grid Grid.Row="2" ColumnDefinitions="*, Auto" ColumnSpacing="5" Margin="10">
             <Button Text="Add Group" Command="{Binding AddGroupCommand}"/>
+            <controls:IconButton Grid.Column="1" Glyph="{StaticResource MoreIcon}" WidthRequest="30" Command="{Binding ShowMoreActionsCommand}"/>
         </Grid>
     </Grid>
 

@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-
+using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -113,6 +113,41 @@ public partial class RootGroupVM : ObservableObject, IDisposable
     private async Task OpenLinkInBrowser(LinkInfo payload)
     {
         await _browserLauncherService.Open(payload.Url);
+    }
+
+    [RelayCommand]
+    private async Task ShowMoreActions()
+    {
+        string action = await Shell.Current.DisplayActionSheet(
+            "Options",
+            "Cancel",
+            null,
+            nameof(Export),
+            nameof(Import));
+
+        switch (action)
+        {
+            case nameof(Export):
+                await Export();
+                break;
+            case nameof(Import):
+                await Import();
+                break;
+        }
+    }
+    
+    private async Task Export()
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var storage = await scope.ServiceProvider.GetRequiredService<Storage>().Initialize();
+        var data = await storage.Export();
+        var json = JsonSerializer.Serialize(data, new JsonSerializerOptions(){WriteIndented = true});
+        await Clipboard.Default.SetTextAsync(json);
+    }
+    
+    private async Task Import()
+    {
+        await Shell.Current.GoToAsync(NavigationRoutes.Import);
     }
 
     private void AddGroup(DataPersistenceOutbox _, CreatedGroup args)
