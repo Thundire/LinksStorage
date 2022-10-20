@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 
 using LinksStorage.Data;
 using LinksStorage.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace LinksStorage.ViewModels;
 
@@ -123,7 +124,8 @@ public partial class RootGroupVM : ObservableObject, IDisposable
             "Cancel",
             null,
             nameof(Export),
-            nameof(Import));
+            nameof(Import),
+            "DataBase path");
 
         switch (action)
         {
@@ -133,6 +135,13 @@ public partial class RootGroupVM : ObservableObject, IDisposable
             case nameof(Import):
                 await Import();
                 break;
+            case "DataBase path":
+            {
+                using var scope = _scopeFactory.CreateScope();
+                var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                await Shell.Current.DisplayPromptAsync("Database", "Path", initialValue:configuration["database"]);
+                break;
+            }
         }
     }
     
@@ -156,9 +165,9 @@ public partial class RootGroupVM : ObservableObject, IDisposable
         Groups.Add(new() { Id = args.Id, Name = args.Name });
     }
 
-    private void RemoveGroup(DataPersistenceOutbox _, RemovedGroup args)
+    private void RemoveGroup(DataPersistenceOutbox outbox, RemovedGroup args)
     {
-        Refresh();
+        _ = Refresh();
     }
 
     private void RemoveLink(DataPersistenceOutbox _, RemovedLink args)
