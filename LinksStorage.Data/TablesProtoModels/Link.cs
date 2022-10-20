@@ -11,7 +11,7 @@ public class Link
     [Indexed, Column("name")]
     public string Name { get; set; }
 
-    [MaxLength(2050), Column("url"), Unique]
+    [MaxLength(2050), Column("url")]
     public string Url { get; set; }
 
     [Indexed, Column("group_id")]
