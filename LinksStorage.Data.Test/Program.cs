@@ -1,4 +1,5 @@
-﻿using LinksStorage.Data;
+﻿using Bogus;
+using LinksStorage.Data;
 
 // initialize data base
 var rootPath = args.Length > 0 ? args[0] + "\\" : string.Empty;
@@ -7,20 +8,21 @@ File.Delete(path);
 var storage = new Storage(path);
 await storage.Initialize();
 
-var rootGroupId = 1;
+Faker faker = new();
 
+var rootGroupId = 1;
 // add groups to root
-var secondGroupId = await storage.AddGroup("Youtube", rootGroupId);
-var thirdGroupId = await storage.AddGroup("Twice", rootGroupId);
+var secondGroupId = await storage.AddGroup(faker.Internet.DomainWord(), rootGroupId);
+var thirdGroupId = await storage.AddGroup(faker.Internet.DomainWord(), rootGroupId);
 
 // add group and 2 links to group 2
-var fourthGroupId = await storage.AddGroup("Random", secondGroupId);
-var firstLinkId = await storage.AddLink("Tow", "ewpjpewjhewh", secondGroupId);
-var secondLinkId = await storage.AddLink("Strow", "ewpjpewjhewh", secondGroupId);
+var fourthGroupId = await storage.AddGroup(faker.Internet.DomainWord(), secondGroupId);
+var firstLinkId = await storage.AddLink(faker.Internet.DomainName(), faker.Internet.Url(), secondGroupId);
+var secondLinkId = await storage.AddLink(faker.Internet.DomainName(), faker.Internet.Url(), secondGroupId);
 // add links to group 3
-var thirdLinkId = await storage.AddLink("Caw", "ewpjpewjhewh", thirdGroupId);
+var thirdLinkId = await storage.AddLink(faker.Internet.DomainName(), faker.Internet.Url(), thirdGroupId);
 // add links to group 4
-var fourthLinkId = await storage.AddLink("Row", "ewpjpewjhewh", fourthGroupId);
+var fourthLinkId = await storage.AddLink(faker.Internet.DomainName(), faker.Internet.Url(), fourthGroupId);
 
 Console.WriteLine("-----Data initialized---------");
 Console.WriteLine(await storage.GetRootPage() + "\n");
@@ -54,3 +56,41 @@ Console.WriteLine(await storage.GetRootPage() + "\n");
 Console.WriteLine(await storage.GetGroup(secondGroupId) + "\n");
 Console.WriteLine(await storage.GetGroup(thirdGroupId) + "\n");
 Console.WriteLine(await storage.GetGroup(fourthGroupId) + "\n");
+
+await storage.RemoveGroup(secondGroupId);
+await storage.RemoveGroup(thirdGroupId);
+await storage.RemoveGroup(fourthGroupId);
+
+
+var group4 = await storage.AddGroup(faker.Internet.DomainWord(), rootGroupId);
+var group3 = await storage.AddGroup(faker.Internet.DomainWord(), rootGroupId);
+var group2 = await storage.AddGroup(faker.Internet.DomainWord(), group3);
+var group1 = await storage.AddGroup(faker.Internet.DomainWord(), group3);
+var favorite1 = await storage.AddLink(faker.Internet.DomainName(), faker.Internet.Url(), secondGroupId);
+var favorite2 = await storage.AddLink(faker.Internet.DomainName(), faker.Internet.Url(), secondGroupId);
+// add links to group 3
+for (var i = 0; i < 4; i++)
+{
+    await storage.AddLink(faker.Internet.DomainName(), faker.Internet.Url(), thirdGroupId);
+}
+// add links to group 4
+
+for (var i = 0; i < 4; i++)
+{
+    await storage.AddLink(faker.Internet.DomainName(), faker.Internet.Url(), group4);
+}
+
+await storage.RegisterFavoriteLink(favorite1);
+await storage.RegisterFavoriteLink(favorite2);
+
+Console.WriteLine("---------Data generated--------");
+Console.WriteLine(await storage.GetRootPage() + "\n");
+Console.WriteLine(await storage.GetGroup(group1) + "\n");
+Console.WriteLine(await storage.GetGroup(group2) + "\n");
+Console.WriteLine(await storage.GetGroup(group3) + "\n");
+Console.WriteLine(await storage.GetGroup(group4) + "\n");
+
+var data = await storage.Export();
+
+Console.WriteLine("---------Export data--------");
+Console.WriteLine(data);

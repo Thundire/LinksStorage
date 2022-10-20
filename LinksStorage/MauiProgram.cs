@@ -31,7 +31,9 @@ public static class MauiProgram
             .AddTransient<LinkEditVM>()
             .AddTransient<LinkEditPage>()
             .AddTransient<GroupVM>()
-            .AddTransient<GroupPage>();
+            .AddTransient<GroupPage>()
+            .AddTransient<ImportVM>()
+            .AddTransient<ImportPage>();
 
         builder.Configuration["database"] = Path.Combine(FileSystem.AppDataDirectory, "LinksStorage.sqlite3");
         builder.Services.AddScoped<Storage>(provider => 

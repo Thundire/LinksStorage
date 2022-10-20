@@ -41,4 +41,9 @@
                      FontFamily="{x:Static resources:FontFamilies.Solid}"
                      Color="{StaticResource Gray100}" Size="20"  
                      />
+    <FontImageSource x:Key="MoreIcon"
+                     Glyph="{x:Static resources:SolidIcons.More}"
+                     FontFamily="{x:Static resources:FontFamilies.Solid}"
+                     Color="{StaticResource Gray100}" Size="20"  
+                     />
 </ResourceDictionary>

@@ -88,4 +88,61 @@ public class Storage
         var link = await _connection.FindAsync<Link>(id).ConfigureAwait(false);
         await _connection.ExecuteAsync("update links set favorite = 0 where id = ?", id);
     }
+
+    public async Task<List<JsonGroup>> Export()
+    {
+        var links = await _connection.QueryAsync<Link>("select * from links").ConfigureAwait(false);
+        var groups = await _connection.QueryAsync<Group>("select * from groups where group_id >= 1");
+        JsonGroup groupImport = ToExport(groups, links, string.Empty, 0);
+        return groupImport.Groups;
+    }
+
+    public async Task Import(List<JsonGroup> data)
+    {
+        foreach (var group in data)
+        {
+            await Import(group, 1);
+        }
+    }
+
+    private async Task Import(JsonGroup data, int parentGroupId)
+    {
+        var group = new Group { Name = data.Name, GroupId = parentGroupId };
+        await _connection.InsertAsync(group).ConfigureAwait(false);
+
+        await _connection.InsertAllAsync(data.Links.Select(x => x.Map(parentGroupId)));
+        foreach (var dataGroup in data.Groups)
+        {
+            await Import(dataGroup, group.Id);
+        }
+    }
+
+    private JsonGroup ToExport(List<Group> groups, List<Link> links, string name, int id)
+    {
+        List<JsonGroup> innerGroups = new();
+        while (groups.Count > 0 && groups.MinBy(g => g.GroupId) is {} group)
+        {
+            groups.Remove(group);
+            if (ToExport(groups, links, group.Name, group.Id) is { } innerGroup)
+            {
+                innerGroups.Add(innerGroup);
+            }
+        }
+
+        List<JsonLink> linksToImport = new();
+        if (id > 0)
+        {
+            var innerLinks = links.Where(x => x.GroupId == id).ToList();
+            if (innerLinks.Count > 0)
+            {
+                foreach (var toRemove in innerLinks)
+                    links.Remove(toRemove);
+
+                linksToImport.AddRange(innerLinks.Select(x=> new JsonLink(x.Name, x.Url, x.IsFavorite)));
+            }
+        }
+
+        JsonGroup result = new(name){Groups = innerGroups, Links = linksToImport};
+        return result;
+    }
 }

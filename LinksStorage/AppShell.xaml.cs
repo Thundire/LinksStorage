@@ -11,6 +11,7 @@ public partial class AppShell : Shell
 
         Routing.RegisterRoute(NavigationRoutes.Group, typeof(GroupPage));
         Routing.RegisterRoute(NavigationRoutes.LinkEditForm, typeof(LinkEditPage));
+        Routing.RegisterRoute(NavigationRoutes.Import, typeof(ImportPage));
     }
 
     public static async Task ToRoot()
