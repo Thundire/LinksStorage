@@ -4,21 +4,15 @@ namespace LinksStorage.Data;
 
 public class JsonGroup
 {
-    public JsonGroup()
-    {
-
-    }
-
-    public JsonGroup(string name, int parentGroupId)
+    public JsonGroup(string name)
     {
         Name = name;
-        ParentGroupId = parentGroupId;
     }
 
-    public string Name { get; init; }
-    public int ParentGroupId { get; init; }
+    public string Name { get; set; }
 
-    public Group Map() => new() { GroupId = ParentGroupId, Name = Name };
+    public List<JsonGroup> Groups { get; set; }
+    public List<JsonLink> Links { get; set; }
 
-    public override string ToString() => $"{Name}, {ParentGroupId}";
+    public override string ToString() => $"{Name}";
 }

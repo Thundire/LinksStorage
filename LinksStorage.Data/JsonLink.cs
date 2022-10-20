@@ -9,20 +9,18 @@ public class JsonLink
 
     }
 
-    public JsonLink(string name, string url, bool isFavorite, int groupId)
+    public JsonLink(string name, string url, bool isFavorite)
     {
         Name = name;
         Url = url;
         IsFavorite = isFavorite;
-        GroupId = groupId;
     }
 
     public string Name { get; init; }
     public string Url { get; init; }
     public bool IsFavorite { get; init; }
-    public int GroupId { get; init; }
 
-    public Link Map() => new() { Name = Name, Url = Url, GroupId = GroupId, IsFavorite = IsFavorite };
+    public Link Map(int parentId) => new() { Name = Name, Url = Url, IsFavorite = IsFavorite, GroupId = parentId };
 
-    public override string ToString() => $"{(IsFavorite ? "*":"")}  {Name}: {Url} ..... {GroupId}";
+    public override string ToString() => $"{(IsFavorite ? "*" : "")}  {Name}: {Url}";
 }

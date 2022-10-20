@@ -23,7 +23,7 @@ public partial class ImportVM : ObservableObject
     {
         if (Value is not { Length: > 2 }) return;
 
-        var data = JsonSerializer.Deserialize<JsonData>(Value);
+        var data = JsonSerializer.Deserialize<List<JsonGroup>>(Value);
         using var scope = _scopeFactory.CreateScope();
         var storage = await scope.ServiceProvider.GetRequiredService<Storage>().Initialize();
         await storage.Import(data);
