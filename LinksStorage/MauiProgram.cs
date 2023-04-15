@@ -5,6 +5,7 @@ using LinksStorage.Resources;
 using LinksStorage.Services;
 using LinksStorage.ViewModels;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace LinksStorage;
 
@@ -43,7 +44,9 @@ public static class MauiProgram
         builder.Services.AddSingleton<DataPersistenceOutbox>();
         builder.Services.AddSingleton<IMessagingCenter, MessagingCenter>();
         builder.Services.AddScoped<BrowserLauncherService>();
-
-        return builder.Build();
+#if DEBUG
+        builder.Logging.AddDebug();
+#endif
+		return builder.Build();
     }
 }

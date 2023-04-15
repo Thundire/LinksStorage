@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LinksStorage", "LinksStorag
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LinksStorage.Data", "LinksStorage.Data\LinksStorage.Data.csproj", "{3A5E7019-C759-4635-9F22-C84C38DFD097}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinksStorage.Data.Test", "LinksStorage.Data.Test\LinksStorage.Data.Test.csproj", "{20A4C3BF-197D-477A-B9B1-DBD038FAB77B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LinksStorage.Data.Test", "LinksStorage.Data.Test\LinksStorage.Data.Test.csproj", "{20A4C3BF-197D-477A-B9B1-DBD038FAB77B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
