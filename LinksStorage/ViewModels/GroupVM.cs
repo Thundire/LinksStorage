@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-
+using CommunityToolkit.Mvvm.Messaging;
 using LinksStorage.Data;
 using LinksStorage.Services;
 
@@ -11,12 +11,12 @@ namespace LinksStorage.ViewModels;
 public sealed partial class GroupVM : RootGroupVM
 {
     public GroupVM(
-        IMessagingCenter messenger,
+        IMessenger messenger,
         IServiceScopeFactory scopeFactory,
         BrowserLauncherService browserLauncherService)
         : base(messenger, scopeFactory, browserLauncherService)
     {
-        messenger.Subscribe<DataPersistenceOutbox, CreatedLink>(this, nameof(CreatedLink), AddLink);
+        messenger.Register<CreatedLink>(this, AddLink);
 
     }
 
@@ -32,22 +32,22 @@ public sealed partial class GroupVM : RootGroupVM
     [RelayCommand]
     private void MarkLinkAsFavorite(LinkInfo payload)
     {
-        _messenger.Send(SenderMark, nameof(Services.MarkLinkAsFavorite), new MarkLinkAsFavorite(payload.Id));
+        _messenger.Send(new MarkLinkAsFavorite(payload.Id));
     }
 
-    private void AddLink(DataPersistenceOutbox _, CreatedLink args)
+    private void AddLink(object _, CreatedLink args)
     {
         if (args.GroupId != GroupId) return;
         Links.Add(new() { Id = args.Id, Name = args.Name, Url = args.Url });
     }
 
-    protected override void MarkLinkAsFavorite(DataPersistenceOutbox _, MarkedLinkAsFavorite args)
+    protected override void MarkLinkAsFavorite(object _, MarkedLinkAsFavorite args)
     {
         if (Links.FirstOrDefault(x => x.Id == args.Id) is not { } entry) return;
         entry.IsFavorite = true;
     }
 
-    protected override void RemoveMarkLinkAsFavorite(DataPersistenceOutbox _, RemovedMarkLinkAsFavorite args)
+    protected override void RemoveMarkLinkAsFavorite(object _, RemovedMarkLinkAsFavorite args)
     {
         if (Links.FirstOrDefault(x => x.Id == args.Id) is not { } entry) return;
         entry.IsFavorite = false;
@@ -55,9 +55,9 @@ public sealed partial class GroupVM : RootGroupVM
 
     protected override Task<GroupData> GetGroupData(int groupId, Storage storage) => storage.GetGroup(groupId);
 
-    public override void Dispose()
-    {
-        _messenger.Unsubscribe<DataPersistenceOutbox, CreatedLink>(this, nameof(CreatedLink));
-        base.Dispose();
-    }
+    //public override void Dispose()
+    //{
+    //    _messenger.UnregisterAll(this);
+    //    base.Dispose();
+    //}
 }

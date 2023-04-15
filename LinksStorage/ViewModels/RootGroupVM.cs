@@ -2,7 +2,7 @@
 using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-
+using CommunityToolkit.Mvvm.Messaging;
 using LinksStorage.Data;
 using LinksStorage.Services;
 using Microsoft.Extensions.Configuration;
@@ -11,7 +11,7 @@ namespace LinksStorage.ViewModels;
 
 public partial class RootGroupVM : ObservableObject, IDisposable
 {
-    protected readonly IMessagingCenter _messenger;
+    protected readonly IMessenger _messenger;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly BrowserLauncherService _browserLauncherService;
     protected static readonly object SenderMark = new();
@@ -23,7 +23,7 @@ public partial class RootGroupVM : ObservableObject, IDisposable
     [ObservableProperty] private ObservableCollection<GroupInfo> _groups;
 
     public RootGroupVM(
-        IMessagingCenter messenger,
+        IMessenger messenger,
         IServiceScopeFactory scopeFactory,
         BrowserLauncherService browserLauncherService)
     {
@@ -37,12 +37,12 @@ public partial class RootGroupVM : ObservableObject, IDisposable
         Links = new();
         Groups = new();
 
-        messenger.Subscribe<DataPersistenceOutbox, MarkedLinkAsFavorite>(this, nameof(MarkedLinkAsFavorite), MarkLinkAsFavorite);
-        messenger.Subscribe<DataPersistenceOutbox, RemovedMarkLinkAsFavorite>(this, nameof(RemovedMarkLinkAsFavorite), RemoveMarkLinkAsFavorite);
-        messenger.Subscribe<DataPersistenceOutbox, RemovedLink>(this, nameof(RemovedLink), RemoveLink);
-        messenger.Subscribe<DataPersistenceOutbox, RemovedGroup>(this, nameof(RemovedGroup), RemoveGroup);
-        messenger.Subscribe<DataPersistenceOutbox, CreatedGroup>(this, nameof(CreatedGroup), AddGroup);
-        messenger.Subscribe<DataPersistenceOutbox, EditLink>(this, nameof(Services.EditLink), UpdateLink);
+        messenger.Register<MarkedLinkAsFavorite>(this, MarkLinkAsFavorite);
+        messenger.Register<RemovedMarkLinkAsFavorite>(this, RemoveMarkLinkAsFavorite);
+        messenger.Register<RemovedLink>(this, RemoveLink);
+        messenger.Register<RemovedGroup>(this, RemoveGroup);
+        messenger.Register<CreatedGroup>(this, AddGroup);
+        messenger.Register<EditLink>(this, UpdateLink);
     }
 
     [RelayCommand]
@@ -61,7 +61,7 @@ public partial class RootGroupVM : ObservableObject, IDisposable
     {
         var input = await Shell.Current.DisplayPromptAsync("Add Group", "Enter group name");
         if (input is not { Length: > 0 }) return;
-        _messenger.Send(SenderMark, nameof(CreateGroup), new CreateGroup(input, GroupId));
+        _messenger.Send(new CreateGroup(input, GroupId));
     }
 
     [RelayCommand]
@@ -80,7 +80,7 @@ public partial class RootGroupVM : ObservableObject, IDisposable
     {
         var input = await Shell.Current.DisplayPromptAsync("Add Group", "Enter group name", initialValue: payload.Name);
         if (input is not { Length: > 0 }) return;
-        _messenger.Send(SenderMark, nameof(ChangeGroupName), new ChangeGroupName(payload.Id, input));
+        _messenger.Send(new ChangeGroupName(payload.Id, input));
     }
 
     [RelayCommand]
@@ -95,19 +95,19 @@ public partial class RootGroupVM : ObservableObject, IDisposable
     [RelayCommand]
     private void RemoveGroup(GroupInfo payload)
     {
-        _messenger.Send(SenderMark, nameof(Services.RemoveGroup), new RemoveGroup(payload.Id));
+        _messenger.Send(new RemoveGroup(payload.Id));
     }
 
     [RelayCommand]
     private void RemoveLink(LinkInfo payload)
     {
-        _messenger.Send(SenderMark, nameof(Services.RemoveLink), new RemoveLink(payload.Id));
+        _messenger.Send(new RemoveLink(payload.Id));
     }
 
     [RelayCommand]
     private void RemoveMarkLinkAsFavorite(LinkInfo payload)
     {
-        _messenger.Send(SenderMark, nameof(Services.RemoveMarkLinkAsFavorite), new RemoveMarkLinkAsFavorite(payload.Id));
+        _messenger.Send(new RemoveMarkLinkAsFavorite(payload.Id));
     }
 
     [RelayCommand]
@@ -159,35 +159,35 @@ public partial class RootGroupVM : ObservableObject, IDisposable
         await Shell.Current.GoToAsync(NavigationRoutes.Import);
     }
 
-    private void AddGroup(DataPersistenceOutbox _, CreatedGroup args)
+    private void AddGroup(object _, CreatedGroup args)
     {
         if (args.ParentGroupId != GroupId) return;
         Groups.Add(new() { Id = args.Id, Name = args.Name });
     }
 
-    private void RemoveGroup(DataPersistenceOutbox outbox, RemovedGroup args)
+    private void RemoveGroup(object _, RemovedGroup args)
     {
         _ = Refresh();
     }
 
-    private void RemoveLink(DataPersistenceOutbox _, RemovedLink args)
+    private void RemoveLink(object _, RemovedLink args)
     {
         if (Links.FirstOrDefault(x => x.Id == args.Id) is not { } entry) return;
         Links.Remove(entry);
     }
 
-    protected virtual void RemoveMarkLinkAsFavorite(DataPersistenceOutbox _, RemovedMarkLinkAsFavorite args)
+    protected virtual void RemoveMarkLinkAsFavorite(object _, RemovedMarkLinkAsFavorite args)
     {
         if (Links.FirstOrDefault(x => x.Id == args.Id) is not { } entry) return;
         Links.Remove(entry);
     }
 
-    protected virtual void MarkLinkAsFavorite(DataPersistenceOutbox _, MarkedLinkAsFavorite args)
+    protected virtual void MarkLinkAsFavorite(object _, MarkedLinkAsFavorite args)
     {
         Links.Add(new() { Id = args.Id, Name = args.Name, Url = args.Url, IsFavorite = true });
     }
 
-    private void UpdateLink(DataPersistenceOutbox _, EditLink args)
+    private void UpdateLink(object _, EditLink args)
     {
         Links.FirstOrDefault(i => i.Id == args.Id)?.Update(args);
     }
@@ -196,11 +196,6 @@ public partial class RootGroupVM : ObservableObject, IDisposable
 
     public virtual void Dispose()
     {
-        _messenger.Unsubscribe<DataPersistenceOutbox, MarkedLinkAsFavorite>(this, nameof(MarkedLinkAsFavorite));
-        _messenger.Unsubscribe<DataPersistenceOutbox, RemovedMarkLinkAsFavorite>(this, nameof(RemovedMarkLinkAsFavorite));
-        _messenger.Unsubscribe<DataPersistenceOutbox, RemovedLink>(this, nameof(RemovedLink));
-        _messenger.Unsubscribe<DataPersistenceOutbox, RemovedGroup>(this, nameof(RemovedGroup));
-        _messenger.Unsubscribe<DataPersistenceOutbox, CreatedGroup>(this, nameof(CreatedGroup));
-        _messenger.Unsubscribe<DataPersistenceOutbox, EditLink>(this, nameof(Services.EditLink));
+        _messenger.UnregisterAll(this);
     }
 }

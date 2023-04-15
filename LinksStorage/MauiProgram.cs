@@ -1,10 +1,12 @@
 ﻿using CommunityToolkit.Maui;
+using CommunityToolkit.Mvvm.Messaging;
 using LinksStorage.Data;
 using LinksStorage.Pages;
 using LinksStorage.Resources;
 using LinksStorage.Services;
 using LinksStorage.ViewModels;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace LinksStorage;
 
@@ -41,9 +43,11 @@ public static class MauiProgram
                 provider, 
                 provider.GetRequiredService<IConfiguration>()["database"]));
         builder.Services.AddSingleton<DataPersistenceOutbox>();
-        builder.Services.AddSingleton<IMessagingCenter, MessagingCenter>();
+        builder.Services.AddSingleton<IMessenger, WeakReferenceMessenger>();
         builder.Services.AddScoped<BrowserLauncherService>();
-
-        return builder.Build();
+#if DEBUG
+        builder.Logging.AddDebug();
+#endif
+		return builder.Build();
     }
 }

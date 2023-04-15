@@ -1,12 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using LinksStorage.Services;
 
 namespace LinksStorage.ViewModels;
 
 public partial class LinkEditVM : ObservableObject, IQueryAttributable
 {
-    private readonly IMessagingCenter _messenger;
+    private readonly IMessenger _messenger;
     private static readonly object SenderMark = new();
     private int _group;
     private bool _isFromRoot;
@@ -20,7 +21,7 @@ public partial class LinkEditVM : ObservableObject, IQueryAttributable
     [ObservableProperty]
     private string _url;
 
-    public LinkEditVM(IMessagingCenter messenger)
+    public LinkEditVM(IMessenger messenger)
     {
         _messenger = messenger;
     }
@@ -31,7 +32,7 @@ public partial class LinkEditVM : ObservableObject, IQueryAttributable
         if (payload is LinkCreateInfo createInfo)
         {
             _id = 0;
-            _isNew = true;
+            IsNew = true;
             _group = createInfo.Group;
             return;
         }
@@ -48,13 +49,13 @@ public partial class LinkEditVM : ObservableObject, IQueryAttributable
     [RelayCommand]
     private async Task Save()
     {
-        if (_isNew)
+        if (IsNew)
         {
-            _messenger.Send(SenderMark, nameof(CreateLink), new CreateLink(_name, _url, _group));
+            _messenger.Send(new CreateLink(Name, Url, _group));
         }
         else
         {
-            _messenger.Send(SenderMark, nameof(EditLink), new EditLink(_id, _name, _url, _group));
+            _messenger.Send(new EditLink(_id, Name, Url, _group));
         }
 
         await Shell.Current.GoToAsync("..", new Dictionary<string, object>()

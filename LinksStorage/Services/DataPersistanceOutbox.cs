@@ -1,26 +1,27 @@
-﻿using LinksStorage.Data;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using LinksStorage.Data;
 
 namespace LinksStorage.Services;
 
-public class DataPersistenceOutbox
+public class DataPersistenceOutbox : IDisposable
 {
     private readonly IServiceScopeFactory _scopeFactory;
-    private readonly IMessagingCenter _messenger;
+    private readonly IMessenger _messenger;
 
-    public DataPersistenceOutbox(IServiceScopeFactory scopeFactory, IMessagingCenter messenger)
+    public DataPersistenceOutbox(IServiceScopeFactory scopeFactory, IMessenger messenger)
     {
         _scopeFactory = scopeFactory;
         _messenger = messenger;
 
-        messenger.Subscribe<object, CreateLink>(this, nameof(CreateLink), CreateLink);
-        messenger.Subscribe<object, EditLink>(this, nameof(EditLink), EditLink);
-        messenger.Subscribe<object, MarkLinkAsFavorite>(this, nameof(MarkLinkAsFavorite), MarkLinkAsFavorite);
-        messenger.Subscribe<object, RemoveMarkLinkAsFavorite>(this, nameof(RemoveMarkLinkAsFavorite), RemoveMarkLinkAsFavorite);
-        messenger.Subscribe<object, RemoveLink>(this, nameof(RemoveLink), RemoveLink);
+        messenger.Register<CreateLink>(this, CreateLink);
+        messenger.Register<EditLink>(this, EditLink);
+        messenger.Register<MarkLinkAsFavorite>(this, MarkLinkAsFavorite);
+        messenger.Register<RemoveMarkLinkAsFavorite>(this, RemoveMarkLinkAsFavorite);
+        messenger.Register<RemoveLink>(this, RemoveLink);
 
-        messenger.Subscribe<object, CreateGroup>(this, nameof(CreateGroup), CreateGroup);
-        messenger.Subscribe<object, ChangeGroupName>(this, nameof(ChangeGroupName), ChangeGroupName);
-        messenger.Subscribe<object, RemoveGroup>(this, nameof(RemoveGroup), RemoveGroup);
+        messenger.Register<CreateGroup>(this, CreateGroup);
+        messenger.Register<ChangeGroupName>(this, ChangeGroupName);
+        messenger.Register<RemoveGroup>(this, RemoveGroup);
     }
 
     private async void CreateLink(object _, CreateLink command)
@@ -28,7 +29,7 @@ public class DataPersistenceOutbox
         using var scope = _scopeFactory.CreateScope();
         var storage = await scope.ServiceProvider.GetRequiredService<Storage>().Initialize();
         var id = await storage.AddLink(command.Name, command.Url, command.GroupId);
-        _messenger.Send(this, nameof(CreatedLink), new CreatedLink(id, command.Name, command.Url, command.GroupId));
+        _messenger.Send(new CreatedLink(id, command.Name, command.Url, command.GroupId));
     }
 
     private async void EditLink(object _, EditLink command)
@@ -36,7 +37,7 @@ public class DataPersistenceOutbox
         using var scope = _scopeFactory.CreateScope();
         var storage = await scope.ServiceProvider.GetRequiredService<Storage>().Initialize();
         await storage.UpdateLink(command.Id, command.Name, command.Url);
-        _messenger.Send(this, nameof(EditedLink), new EditedLink(command.Id, command.Name, command.Url, command.GroupId));
+        _messenger.Send(new EditedLink(command.Id, command.Name, command.Url, command.GroupId));
     }
 
     private async void MarkLinkAsFavorite(object _, MarkLinkAsFavorite command)
@@ -44,7 +45,7 @@ public class DataPersistenceOutbox
         using var scope = _scopeFactory.CreateScope();
         var storage = await scope.ServiceProvider.GetRequiredService<Storage>().Initialize();
         var linkInfo = await storage.RegisterFavoriteLink(command.Id);
-        _messenger.Send(this, nameof(MarkedLinkAsFavorite), new MarkedLinkAsFavorite(command.Id, linkInfo.Name, linkInfo.Url));
+        _messenger.Send(new MarkedLinkAsFavorite(command.Id, linkInfo.Name, linkInfo.Url));
     }
 
     private async void RemoveMarkLinkAsFavorite(object _, RemoveMarkLinkAsFavorite command)
@@ -52,7 +53,7 @@ public class DataPersistenceOutbox
         using var scope = _scopeFactory.CreateScope();
         var storage = await scope.ServiceProvider.GetRequiredService<Storage>().Initialize();
         await storage.RemoveLinkFromFavorites(command.Id);
-        _messenger.Send(this, nameof(RemovedMarkLinkAsFavorite), new RemovedMarkLinkAsFavorite(command.Id));
+        _messenger.Send(new RemovedMarkLinkAsFavorite(command.Id));
     }
 
     private async void RemoveLink(object _, RemoveLink command)
@@ -60,7 +61,7 @@ public class DataPersistenceOutbox
         using var scope = _scopeFactory.CreateScope();
         var storage = await scope.ServiceProvider.GetRequiredService<Storage>().Initialize();
         await storage.RemoveLink(command.Id);
-        _messenger.Send(this, nameof(RemovedLink), new RemovedLink(command.Id));
+        _messenger.Send(new RemovedLink(command.Id));
     }
 
     private async void CreateGroup(object _, CreateGroup command)
@@ -68,7 +69,7 @@ public class DataPersistenceOutbox
         using var scope = _scopeFactory.CreateScope();
         var storage = await scope.ServiceProvider.GetRequiredService<Storage>().Initialize();
         var id = await storage.AddGroup(command.Name, command.ParentGroupId);
-        _messenger.Send(this, nameof(CreatedGroup), new CreatedGroup(id, command.Name, command.ParentGroupId));
+        _messenger.Send(new CreatedGroup(id, command.Name, command.ParentGroupId));
     }
 
     private async void ChangeGroupName(object _, ChangeGroupName command)
@@ -76,7 +77,7 @@ public class DataPersistenceOutbox
         using var scope = _scopeFactory.CreateScope();
         var storage = await scope.ServiceProvider.GetRequiredService<Storage>().Initialize();
         await storage.ChangeGroupName(command.Id, command.Name);
-        _messenger.Send(this, nameof(ChangedGroupName), new ChangedGroupName(command.Id, command.Name));
+        _messenger.Send(new ChangedGroupName(command.Id, command.Name));
     }
 
     private async void RemoveGroup(object _, RemoveGroup command)
@@ -84,8 +85,13 @@ public class DataPersistenceOutbox
         using var scope = _scopeFactory.CreateScope();
         var storage = await scope.ServiceProvider.GetRequiredService<Storage>().Initialize();
         await storage.RemoveGroup(command.Id);
-        _messenger.Send(this, nameof(RemovedGroup), new RemovedGroup(command.Id));
+        _messenger.Send(new RemovedGroup(command.Id));
     }
+
+	public void Dispose()
+	{
+		_messenger.UnregisterAll(this);
+	}
 }
 
 public record CreateLink(string Name, string Url, int GroupId);
