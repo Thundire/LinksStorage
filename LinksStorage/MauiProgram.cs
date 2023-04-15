@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui;
+using CommunityToolkit.Mvvm.Messaging;
 using LinksStorage.Data;
 using LinksStorage.Pages;
 using LinksStorage.Resources;
@@ -42,7 +43,7 @@ public static class MauiProgram
                 provider, 
                 provider.GetRequiredService<IConfiguration>()["database"]));
         builder.Services.AddSingleton<DataPersistenceOutbox>();
-        builder.Services.AddSingleton<IMessagingCenter, MessagingCenter>();
+        builder.Services.AddSingleton<IMessenger, WeakReferenceMessenger>();
         builder.Services.AddScoped<BrowserLauncherService>();
 #if DEBUG
         builder.Logging.AddDebug();
