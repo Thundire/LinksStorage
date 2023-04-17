@@ -1,5 +1,5 @@
 ﻿using LinksStorage.Data.TablesProtoModels;
-
+using LinksStorage.Shared;
 using SQLite;
 
 namespace LinksStorage.Data;

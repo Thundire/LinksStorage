@@ -1,6 +1,4 @@
-﻿using LinksStorage.Data.TablesProtoModels;
-
-namespace LinksStorage.Data;
+﻿namespace LinksStorage.Shared;
 
 public class JsonGroup
 {
