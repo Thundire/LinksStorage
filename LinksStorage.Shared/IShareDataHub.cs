@@ -2,6 +2,9 @@
 
 public interface IShareDataHub
 {
-	Task<List<JsonGroup>> Export();
-	Task Import(List<JsonGroup> groups);
+	Task<List<JsonGroup>> Import(string clientId);
+	Task Export(List<JsonGroup> groups, string clientId);
+	List<string> ListClients();
+	Task AskForShare(string clientId);
+	Task ShareAnswer(string clientId, bool confirm);
 }
