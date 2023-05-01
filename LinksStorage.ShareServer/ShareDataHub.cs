@@ -46,8 +46,8 @@ public class ShareDataHub : Hub<IShareDataClient>, IShareDataHub
 		return Task.CompletedTask;
 	}
 
-	public List<string> ListClients()
+	public Task<List<string>> ListClients()
 	{
-		return _cache.List(Context.ConnectionId);
+		return Task.FromResult(_cache.List(Context.ConnectionId));
 	}
 }

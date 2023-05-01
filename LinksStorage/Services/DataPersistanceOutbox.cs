@@ -1,5 +1,10 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+﻿using System.Text.Json;
+using System.Threading.Channels;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 using LinksStorage.Data;
+using LinksStorage.Shared;
+using Microsoft.Extensions.Configuration;
 
 namespace LinksStorage.Services;
 
@@ -7,13 +12,15 @@ public class DataPersistenceOutbox : IDisposable
 {
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IMessenger _messenger;
+	private readonly ShareDataClient _shareDataClient;
 
-    public DataPersistenceOutbox(IServiceScopeFactory scopeFactory, IMessenger messenger)
+	public DataPersistenceOutbox(IServiceScopeFactory scopeFactory, IMessenger messenger, ShareDataClient shareDataClient)
     {
         _scopeFactory = scopeFactory;
         _messenger = messenger;
+		_shareDataClient = shareDataClient;
 
-        messenger.Register<CreateLink>(this, CreateLink);
+		messenger.Register<CreateLink>(this, CreateLink);
         messenger.Register<EditLink>(this, EditLink);
         messenger.Register<MarkLinkAsFavorite>(this, MarkLinkAsFavorite);
         messenger.Register<RemoveMarkLinkAsFavorite>(this, RemoveMarkLinkAsFavorite);
@@ -22,7 +29,20 @@ public class DataPersistenceOutbox : IDisposable
         messenger.Register<CreateGroup>(this, CreateGroup);
         messenger.Register<ChangeGroupName>(this, ChangeGroupName);
         messenger.Register<RemoveGroup>(this, RemoveGroup);
+
+        messenger.Register<Import>(this, Import);
+        messenger.Register<ExportToClipboard>(this, ExportToClipboard);
+        messenger.Register<ExportToShareServer>(this, ExportToShareServer);
+        messenger.Register<DataPersistenceOutbox, PrepareExportingData>(this, PrepareExportingData);
     }
+
+	public async Task Start()
+	{
+		await using var scope = _scopeFactory.CreateAsyncScope();
+		IConfiguration configuration = scope.ServiceProvider.GetService<IConfiguration>();
+		
+		await _shareDataClient.Start(configuration["share-hub"]);
+	}
 
     private async void CreateLink(object _, CreateLink command)
     {
@@ -88,6 +108,46 @@ public class DataPersistenceOutbox : IDisposable
         _messenger.Send(new RemovedGroup(command.Id));
     }
 
+    private async void Import(object _, Import command)
+    {
+	    using var scope = _scopeFactory.CreateScope();
+	    var storage = await scope.ServiceProvider.GetRequiredService<Storage>().Initialize();
+	    await storage.Import(command.Groups);
+
+	    _messenger.Send(new DataImported());
+    }
+
+    private async void ExportToClipboard(object _, ExportToClipboard command)
+    {
+		var data = await PrepareExportData();
+		var json = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
+	    await Clipboard.Default.SetTextAsync(json);
+
+	    _messenger.Send(new DataExported("clipboard"));
+    }
+
+
+    private async void ExportToShareServer(object _, ExportToShareServer command)
+    {
+	    var data = await PrepareExportData();
+	    await _shareDataClient.Export(data, command.ClientId);
+
+	    _messenger.Send(new DataExported("share", command.ClientId));
+    }
+
+    private void PrepareExportingData(DataPersistenceOutbox outbox, PrepareExportingData message)
+    {
+        message.Reply(outbox.PrepareExportData());
+    }
+
+    private async Task<List<JsonGroup>> PrepareExportData()
+    {
+		using IServiceScope scope = _scopeFactory.CreateScope();
+		Storage storage = await scope.ServiceProvider.GetRequiredService<Storage>().Initialize();
+		var data = await storage.Export();
+        return data;
+	}
+
 	public void Dispose()
 	{
 		_messenger.UnregisterAll(this);
@@ -113,3 +173,17 @@ public record RemovedLink(int Id);
 public record CreatedGroup(int Id, string Name, int ParentGroupId);
 public record ChangedGroupName(int Id, string Name);
 public record RemovedGroup(int Id);
+
+public record Import(List<JsonGroup> Groups);
+public class ExportToClipboard : AsyncRequestMessage<List<JsonGroup>>{}
+public class ExportToShareServer : AsyncRequestMessage<List<JsonGroup>>
+{
+    public required string ClientId { get; init; }
+}
+public class PrepareExportingData : AsyncRequestMessage<List<JsonGroup>> { }
+
+public record DataExported(string ExportTarget, string TargetClientId = default);
+public record DataImported;
+
+public record AskShare(string ClientId);
+public record AnswerShare(string ClientId, bool Confirm);

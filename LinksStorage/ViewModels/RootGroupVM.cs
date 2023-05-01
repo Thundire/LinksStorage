@@ -1,10 +1,12 @@
 ﻿using System.Collections.ObjectModel;
-using System.Text.Json;
+
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+
 using LinksStorage.Data;
 using LinksStorage.Services;
+
 using Microsoft.Extensions.Configuration;
 
 namespace LinksStorage.ViewModels;
@@ -43,6 +45,16 @@ public partial class RootGroupVM : ObservableObject, IDisposable
         messenger.Register<RemovedGroup>(this, RemoveGroup);
         messenger.Register<CreatedGroup>(this, AddGroup);
         messenger.Register<EditLink>(this, UpdateLink);
+
+        messenger.Register<DataExported>(this, FinishExport);
+
+        messenger.Register<AskShare>(this, AskedShare);
+    }
+
+    private async void AskedShare(object recipient, AskShare message)
+    {
+	    var result = await Shell.Current.DisplayAlert("Share", $"Asked from {message.ClientId}", "Confirm", "Cancel");
+	    _messenger.Send(new AnswerShare(message.ClientId, result));
     }
 
     [RelayCommand]
@@ -123,16 +135,20 @@ public partial class RootGroupVM : ObservableObject, IDisposable
             "Options",
             "Cancel",
             null,
-            nameof(Export),
-            nameof(Import),
+            "Export to Clipboard",
+			"Export to Share server",
+			nameof(Import),
             "DataBase path");
 
         switch (action)
         {
-            case nameof(Export):
-                await Export();
+            case "Export to Clipboard":
+                await ExportToClipboard();
                 break;
-            case nameof(Import):
+            case "Export to Share server":
+	            await ExportToShareServer();
+	            break;
+			case nameof(Import):
                 await Import();
                 break;
             case "DataBase path":
@@ -144,15 +160,21 @@ public partial class RootGroupVM : ObservableObject, IDisposable
             }
         }
     }
-    
-    private async Task Export()
-    {
-        using var scope = _scopeFactory.CreateScope();
-        var storage = await scope.ServiceProvider.GetRequiredService<Storage>().Initialize();
-        var data = await storage.Export();
-        var json = JsonSerializer.Serialize(data, new JsonSerializerOptions(){WriteIndented = true});
-        await Clipboard.Default.SetTextAsync(json);
-    }
+
+	private async Task ExportToClipboard()
+	{
+		await _messenger.Send<ExportToClipboard>();
+	}
+
+	private async Task ExportToShareServer()
+	{
+		List<string> clients = await _messenger.Send<ListClients>();
+
+		string result = await Shell.Current.DisplayActionSheet("To whom", "Cancel", null, clients.ToArray());
+        if(result == "Cancel") return;
+
+        _messenger.Send(new AskShare(result));
+	}
     
     private async Task Import()
     {
@@ -190,6 +212,11 @@ public partial class RootGroupVM : ObservableObject, IDisposable
     private void UpdateLink(object _, EditLink args)
     {
         Links.FirstOrDefault(i => i.Id == args.Id)?.Update(args);
+    }
+
+    private async void FinishExport(object _, DataExported args)
+    {
+        await Shell.Current.DisplayAlert("Share", $"Data exported to {args.ExportTarget}{(args.TargetClientId is {Length:>0} clientId ? $" {clientId}" : "")}", "Cancel");
     }
 
     protected virtual Task<GroupData> GetGroupData(int groupId, Storage storage) => storage.GetRootPage();
