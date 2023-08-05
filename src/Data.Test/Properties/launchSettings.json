@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "LinksStorage.Data.Test": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\Projects\\Databases\\SQLite",
+      "nativeDebugging": false
+    }
+  }
+}
