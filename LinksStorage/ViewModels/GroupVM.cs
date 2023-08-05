@@ -53,7 +53,7 @@ public sealed partial class GroupVM : RootGroupVM
         entry.IsFavorite = false;
     }
 
-    protected override Task<GroupData> GetGroupData(int groupId, Storage storage) => storage.GetGroup(groupId);
+    protected override Task<GroupData> GetGroupData(Guid groupId, Storage storage) => storage.GetGroup(groupId);
 
     //public override void Dispose()
     //{

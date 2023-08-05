@@ -46,14 +46,14 @@ public class ShareDataClient : IAsyncDisposable, IShareDataClient, IShareDataHub
 			await _hub.DisposeAsync();
 	}
 
-	public async Task<List<JsonGroup>> Import(string clientId)
+	public async Task<JsonData> Import(string clientId)
 	{
-		return await _hub.InvokeAsync<List<JsonGroup>>(nameof(Import), clientId);
+		return await _hub.InvokeAsync<JsonData>(nameof(Import), clientId);
 	}
 
-	public async Task Export(List<JsonGroup> groups, string clientId)
+	public async Task Export(JsonData data, string clientId)
 	{
-		await _hub.SendAsync(nameof(Export), groups, clientId);
+		await _hub.SendAsync(nameof(Export), data, clientId);
 	}
 
 	public async Task<List<string>> ListClients()
@@ -71,13 +71,13 @@ public class ShareDataClient : IAsyncDisposable, IShareDataClient, IShareDataHub
 		await _hub.SendAsync(nameof(ShareAnswer), clientId, confirm);
 	}
 
-	public Task Importing(List<JsonGroup> groups)
+	public Task Importing(JsonData data)
 	{
-		_messenger.Send(new Import(groups));
+		_messenger.Send(new Import(data));
 		return Task.CompletedTask;
 	}
 
-	public async Task<List<JsonGroup>> Exporting()
+	public async Task<JsonData> Exporting()
 	{
 		var data = await _messenger.Send<PrepareExportingData>();
 		return data;

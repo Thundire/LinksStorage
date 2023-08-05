@@ -31,6 +31,12 @@ public class DataContext : DbContext
 	public DbSet<Group> Groups { get; init; }
     public DbSet<Link> Links { get; init; }
 
+	public void Reload()
+	{
+		Database.CloseConnection();
+		Database.OpenConnection();
+	}
+
 	void Initialize()
 	{
 		if (!Initialized)
@@ -49,9 +55,32 @@ public class DataContext : DbContext
 			.UseSqlite($"Filename={File}");
 	}
 
-	public void Reload()
+	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
-		Database.CloseConnection();
-		Database.OpenConnection();
+		base.OnModelCreating(modelBuilder);
+
+		modelBuilder.Entity<Group>(entityBuilder =>
+		{
+			entityBuilder.ToTable("groups");
+
+			entityBuilder.Property(e => e.Name).HasColumnName("name");
+			entityBuilder.Property(e => e.Parent).HasColumnName("parent");
+			entityBuilder.IndexerProperty<string>(nameof(Group.Name));
+
+			entityBuilder.HasMany(e => e.Groups).WithOne(e => e.Parent);
+			entityBuilder.HasMany(e => e.Links).WithOne(e => e.Parent);
+		});
+
+		modelBuilder.Entity<Link>(entityBuilder =>
+		{
+			entityBuilder.ToTable("links");
+
+			entityBuilder.Property(e => e.Name).HasColumnName("name");
+			entityBuilder.Property(e => e.Parent).HasColumnName("parent");
+			entityBuilder.Property(e => e.Url).HasMaxLength(2050).HasColumnName("url");
+			entityBuilder.Property(e => e.IsFavorite).HasColumnName("favorite");
+			entityBuilder.IndexerProperty<string>(nameof(Link.Name));
+			entityBuilder.IndexerProperty<bool>(nameof(Link.IsFavorite));
+		});
 	}
 }

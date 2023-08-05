@@ -1,148 +1,144 @@
 ﻿using LinksStorage.Data.TablesProtoModels;
 using LinksStorage.Shared;
-using SQLite;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace LinksStorage.Data;
 
 public class Storage
 {
-    private readonly SQLiteAsyncConnection _connection;
+    private readonly DataContext _context;
 
     public Storage(string connectionString)
     {
-        _connection = new(connectionString);
+        _context = new(connectionString);
     }
 
     public async Task<Storage> Initialize()
     {
-        await _connection.CreateTablesAsync<Group, Link>().ConfigureAwait(false);
-        await _connection.ExecuteAsync("insert into groups(name) select 'root' where not exists (select 1 from groups where id = 1 and name = 'root')");
+        await _context.Database.MigrateAsync();
         return this;
     }
 
-    public async Task<int> AddGroup(string name, int parentGroupId)
+    public async Task<Guid> AddGroup(string name, Guid parentGroupId)
     {
-        Group group = new() { Name = name, GroupId = parentGroupId };
-        await _connection.InsertAsync(group).ConfigureAwait(false);
+        Group? parentGroup = await _context.Groups.FindAsync(parentGroupId);
+        if(parentGroup is null) return Guid.Empty;
+        
+        Group group = new() { Name = name };
+
+		parentGroup.Groups.Add(group);
+
+        await _context.SaveChangesAsync();
+
         return group.Id;
     }
 
-    public async Task<int> AddLink(string alias, string url, int parentGroupId)
+    public async Task<Guid> AddLink(string alias, string url, Guid parentGroupId)
     {
-        Link link = new() { Name = alias, Url = url, GroupId = parentGroupId };
-        await _connection.InsertAsync(link).ConfigureAwait(false);
-        return link.Id;
+		Group? parentGroup = await _context.Groups.FindAsync(parentGroupId);
+		if (parentGroup is null) return Guid.Empty;
+
+		Link link = new() { Name = alias, Url = url };
+
+        parentGroup.Links.Add(link);
+
+		await _context.SaveChangesAsync();
+
+		return link.Id;
     }
 
-    public async Task UpdateLink(int id, string name, string url)
+    public async Task UpdateLink(Guid id, string name, string url)
     {
-        await _connection.ExecuteAsync($"update links set name = '{name}', url = '{url}' where id = {id}").ConfigureAwait(false);
-    }
+        Link? link = await _context.Links.FindAsync(id);
+        if (link is null) return;
 
-    public async Task<LinkInfoData> RegisterFavoriteLink(int linkId)
+		link.Name = name;
+        link.Url = url;
+
+		await _context.SaveChangesAsync();
+	}
+
+    public async Task<LinkInfoData> RegisterFavoriteLink(Guid linkId)
     {
-        var link = await _connection.FindAsync<Link>(linkId);
-        await _connection.ExecuteAsync("update links set favorite = 1 where id = ?", linkId).ConfigureAwait(false);
-        return new() { Id = linkId, Name = link.Name, Url = link.Url, IsFavorite = true };
+        Link? link = await _context.FindAsync<Link>(linkId);
+        if (link is null) return LinkInfoData.Empty;
+
+		link.IsFavorite = true;
+
+		await _context.SaveChangesAsync();
+
+		return new() { Id = linkId, Name = link.Name, Url = link.Url, IsFavorite = true };
     }
 
     public async Task<GroupData> GetRootPage()
     {
-        var hotLinks = await _connection.QueryAsync<LinkInfoData>("select id, name, url, favorite from links where favorite = 1").ConfigureAwait(false);
-        var groups = await _connection.QueryAsync<GroupInfoData>("select id, name from groups where group_id = 1");
+        var hotLinks = await _context.Links.AsNoTracking().Where(x => x.IsFavorite).Select(x => new LinkInfoData() { Id = x.Id, Name = x.Name, Url = x.Url, IsFavorite = true }).ToListAsync();
+        var groups = await _context.Groups.AsNoTracking().Where(x => x.Parent == null).Select(x => new GroupInfoData() { Id = x.Id, Name = x.Name }).ToListAsync();
         return new(hotLinks, groups);
     }
 
-    public async Task<GroupData> GetGroup(int groupId)
+    public async Task<GroupData> GetGroup(Guid groupId)
     {
-        var links = await _connection.QueryAsync<LinkInfoData>("select id, name, url, favorite from links where group_id = ?", groupId).ConfigureAwait(false);
-        var groups = await _connection.QueryAsync<GroupInfoData>("select id, name from groups where group_id = ?", groupId);
-        return new(links, groups);
+		GroupData? result = await _context.Groups
+			.AsNoTracking()
+	        .Where(x => x.Id == groupId)
+	        .Select(x => new GroupData(
+		        x.Links.Select(l =>  new LinkInfoData  { Id = l.Id, Name = l.Name, Url = l.Url, IsFavorite = l.IsFavorite }),
+		        x.Groups.Select(g => new GroupInfoData { Id = g.Id, Name = g.Name })))
+	        .FirstOrDefaultAsync();
+		return result ?? GroupData.Empty;
     }
 
-    public async Task ChangeGroupName(int groupId, string name)
+    public async Task ChangeGroupName(Guid groupId, string name)
     {
-        await _connection.ExecuteAsync($"update groups set name = '{name}' where id = {groupId}").ConfigureAwait(false);
+        Group? group = await _context.Groups.FindAsync(groupId);
+        if (group is null) return;
+
+		group.Name = name;
+
+		await _context.SaveChangesAsync();
+	}
+
+    public async Task RemoveLink(Guid id)
+    {
+        Link? link = await _context.Links.FindAsync(id);
+        if (link is null) return;
+
+		_context.Remove(link);
+
+        await _context.SaveChangesAsync();
     }
 
-    public async Task RemoveLink(int id)
+    public async Task RemoveGroup(Guid id)
     {
-        await _connection.DeleteAsync<Link>(id).ConfigureAwait(false);
+		Group? group = await _context.Groups.FindAsync(id);
+		if (group is null) return;
+        
+		_context.Remove(group);
+		
+        await _context.SaveChangesAsync();
     }
 
-    public async Task RemoveGroup(int id)
+    public async Task RemoveLinkFromFavorites(Guid id)
     {
-        await _connection.RunInTransactionAsync(c =>
-       {
-           // delete group
-           c.Delete<Group>(id);
-           // delete groups that inside group
-           c.Execute("delete from groups where group_id = ?", id);
-           // delete links in group
-           c.Execute("delete from links where group_id = ?", id);
-       }).ConfigureAwait(false);
+        Link? link = await _context.Links.FindAsync(id);
+        if(link is null) return;
+        link.IsFavorite = false;
+        await _context.SaveChangesAsync();
     }
 
-    public async Task RemoveLinkFromFavorites(int id)
+    public async Task<JsonData> Export()
     {
-        var link = await _connection.FindAsync<Link>(id).ConfigureAwait(false);
-        await _connection.ExecuteAsync("update links set favorite = 0 where id = ?", id);
+        var links = await _context.Links.AsNoTracking().Select(x=>new JsonLink(x.Name, x.Url, x.IsFavorite, x.Parent.Id)).ToListAsync();
+        var groups = await _context.Groups.AsNoTracking().Select(x => new JsonGroup(x.Id, x.Name, x.Parent != null ? x.Parent.Id : Guid.Empty)).ToListAsync();
+        
+        return new(){Id = Guid.NewGuid(), Links = links, Groups = groups};
     }
 
-    public async Task<List<JsonGroup>> Export()
+    public async Task Import(JsonData data)
     {
-        var links = await _connection.QueryAsync<Link>("select * from links").ConfigureAwait(false);
-        var groups = await _connection.QueryAsync<Group>("select * from groups where group_id >= 1");
-        JsonGroup groupImport = ToExport(groups, links, string.Empty, 0);
-        return groupImport.Groups;
-    }
-
-    public async Task Import(List<JsonGroup> data)
-    {
-        foreach (var group in data)
-        {
-            await Import(group, 1);
-        }
-    }
-
-    private async Task Import(JsonGroup data, int parentGroupId)
-    {
-        var group = new Group { Name = data.Name, GroupId = parentGroupId };
-        await _connection.InsertAsync(group).ConfigureAwait(false);
-
-        await _connection.InsertAllAsync(data.Links.Select(x => x.Map(parentGroupId)));
-        foreach (var dataGroup in data.Groups)
-        {
-            await Import(dataGroup, group.Id);
-        }
-    }
-
-    private JsonGroup ToExport(List<Group> groups, List<Link> links, string name, int id)
-    {
-        List<JsonGroup> innerGroups = new();
-        while (groups.Count > 0 && groups.MinBy(g => g.GroupId) is {} group)
-        {
-            groups.Remove(group);
-            if (ToExport(groups, links, group.Name, group.Id) is { } innerGroup)
-            {
-                innerGroups.Add(innerGroup);
-            }
-        }
-
-        List<JsonLink> linksToImport = new();
-        if (id > 0)
-        {
-            var innerLinks = links.Where(x => x.GroupId == id).ToList();
-            if (innerLinks.Count > 0)
-            {
-                foreach (var toRemove in innerLinks)
-                    links.Remove(toRemove);
-
-                linksToImport.AddRange(innerLinks.Select(x=> new JsonLink(x.Name, x.Url, x.IsFavorite)));
-            }
-        }
-
-        JsonGroup result = new(name){Groups = innerGroups, Links = linksToImport};
-        return result;
+	    
     }
 }

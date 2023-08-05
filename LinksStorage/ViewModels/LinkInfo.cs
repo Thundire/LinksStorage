@@ -6,7 +6,7 @@ namespace LinksStorage.ViewModels;
 
 public partial class LinkInfo : ObservableObject
 {
-    [ObservableProperty] private int _id;
+    [ObservableProperty] private Guid _id;
     [ObservableProperty] private string _name;
     [ObservableProperty] private string _url;
     [ObservableProperty] private bool _isFavorite;

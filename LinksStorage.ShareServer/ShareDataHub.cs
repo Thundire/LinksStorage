@@ -9,14 +9,14 @@ public class ShareDataHub : Hub<IShareDataClient>, IShareDataHub
 
 	public ShareDataHub(Cache cache) => _cache = cache;
 
-	public async Task<List<JsonGroup>> Import(string clientId)
+	public async Task<JsonData> Import(string clientId)
 	{
 		IShareDataClient client = Clients.Client(clientId);
 		var data = await client.Exporting();
 		return data;
 	}
 
-	public async Task Export(List<JsonGroup> groups, string clientId)
+	public async Task Export(JsonData groups, string clientId)
 	{
 		IShareDataClient client = Clients.Client(clientId);
 		await client.Importing(groups);

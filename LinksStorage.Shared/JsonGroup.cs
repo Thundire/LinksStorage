@@ -2,15 +2,14 @@
 
 public class JsonGroup
 {
-    public JsonGroup(string name)
-    {
-        Name = name;
-    }
+	public JsonGroup(Guid id, string name, Guid parentId)
+	{
+		Id = id;
+		Name = name;
+		ParentId = parentId;
+	}
 
-    public string Name { get; set; }
-
-    public List<JsonGroup> Groups { get; set; }
-    public List<JsonLink> Links { get; set; }
-
-    public override string ToString() => $"{Name}";
+	public Guid Id { get; init; }
+	public string Name { get; init; } = string.Empty;
+	public Guid ParentId { get; init; }
 }

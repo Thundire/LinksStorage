@@ -1,3 +1,3 @@
 ﻿namespace LinksStorage.ViewModels;
 
-public record LinkCreateInfo(int Group);
+public record LinkCreateInfo(Guid Group);

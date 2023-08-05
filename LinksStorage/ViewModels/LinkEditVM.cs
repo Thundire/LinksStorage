@@ -9,9 +9,9 @@ public partial class LinkEditVM : ObservableObject, IQueryAttributable
 {
     private readonly IMessenger _messenger;
     private static readonly object SenderMark = new();
-    private int _group;
+    private Guid _group;
     private bool _isFromRoot;
-    private int _id;
+    private Guid _id;
 
     [ObservableProperty]
     private bool _isNew;
@@ -31,7 +31,7 @@ public partial class LinkEditVM : ObservableObject, IQueryAttributable
         var payload = query["payload"];
         if (payload is LinkCreateInfo createInfo)
         {
-            _id = 0;
+            _id = Guid.Empty;
             IsNew = true;
             _group = createInfo.Group;
             return;

@@ -17,7 +17,7 @@ public partial class RootGroupVM : ObservableObject, IDisposable
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly BrowserLauncherService _browserLauncherService;
     protected static readonly object SenderMark = new();
-    public int GroupId { get; set; }
+    public Guid GroupId { get; set; }
 
     [ObservableProperty] private string _groupName;
     [ObservableProperty] private bool _isNotFromRoot;
@@ -29,7 +29,7 @@ public partial class RootGroupVM : ObservableObject, IDisposable
         IServiceScopeFactory scopeFactory,
         BrowserLauncherService browserLauncherService)
     {
-        GroupId = 1;
+        GroupId   = Guid.Empty;
         GroupName = "Home";
 
         _messenger = messenger;
@@ -83,7 +83,7 @@ public partial class RootGroupVM : ObservableObject, IDisposable
         {
             ["groupId"] = group.Id,
             ["groupName"] = group.Name,
-            ["notFromRoot"] = GroupId != 1
+            ["notFromRoot"] = GroupId != Guid.Empty
         });
     }
 
@@ -219,7 +219,7 @@ public partial class RootGroupVM : ObservableObject, IDisposable
         await Shell.Current.DisplayAlert("Share", $"Data exported to {args.ExportTarget}{(args.TargetClientId is {Length:>0} clientId ? $" {clientId}" : "")}", "Cancel");
     }
 
-    protected virtual Task<GroupData> GetGroupData(int groupId, Storage storage) => storage.GetRootPage();
+    protected virtual Task<GroupData> GetGroupData(Guid groupId, Storage storage) => storage.GetRootPage();
 
     public virtual void Dispose()
     {

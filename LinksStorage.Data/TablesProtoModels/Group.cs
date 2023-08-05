@@ -1,16 +1,10 @@
-﻿using SQLite;
+﻿namespace LinksStorage.Data.TablesProtoModels;
 
-namespace LinksStorage.Data.TablesProtoModels;
-
-[Table("groups")]
-public class Group
+public class Group : Entity
 {
-    [PrimaryKey, AutoIncrement, Column("id")]
-    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
 
-    [Indexed, Column("name")]
-    public string Name { get; set; }
-
-    [Column("group_id")]
-    public int GroupId { get; set; }
+    public Group? Parent { get; set; }
+    public ICollection<Link> Links { get; set; } = new HashSet<Link>();
+    public ICollection<Group> Groups { get; set; } = new HashSet<Group>();
 }

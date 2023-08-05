@@ -112,7 +112,7 @@ public class DataPersistenceOutbox : IDisposable
     {
 	    using var scope = _scopeFactory.CreateScope();
 	    var storage = await scope.ServiceProvider.GetRequiredService<Storage>().Initialize();
-	    await storage.Import(command.Groups);
+	    await storage.Import(command.Data);
 
 	    _messenger.Send(new DataImported());
     }
@@ -140,7 +140,7 @@ public class DataPersistenceOutbox : IDisposable
         message.Reply(outbox.PrepareExportData());
     }
 
-    private async Task<List<JsonGroup>> PrepareExportData()
+    private async Task<JsonData> PrepareExportData()
     {
 		using IServiceScope scope = _scopeFactory.CreateScope();
 		Storage storage = await scope.ServiceProvider.GetRequiredService<Storage>().Initialize();
@@ -154,33 +154,33 @@ public class DataPersistenceOutbox : IDisposable
 	}
 }
 
-public record CreateLink(string Name, string Url, int GroupId);
-public record EditLink(int Id, string Name, string Url, int GroupId);
-public record MarkLinkAsFavorite(int Id);
-public record RemoveMarkLinkAsFavorite(int Id);
-public record RemoveLink(int Id);
+public record CreateLink(string Name, string Url, Guid GroupId);
+public record EditLink(Guid Id, string Name, string Url, Guid GroupId);
+public record MarkLinkAsFavorite(Guid Id);
+public record RemoveMarkLinkAsFavorite(Guid Id);
+public record RemoveLink(Guid Id);
 
-public record CreateGroup(string Name, int ParentGroupId);
-public record ChangeGroupName(int Id, string Name);
-public record RemoveGroup(int Id);
+public record CreateGroup(string Name, Guid ParentGroupId);
+public record ChangeGroupName(Guid Id, string Name);
+public record RemoveGroup(Guid Id);
 
-public record CreatedLink(int Id, string Name, string Url, int GroupId);
-public record EditedLink(int Id, string Name, string Url, int GroupId);
-public record MarkedLinkAsFavorite(int Id, string Name, string Url);
-public record RemovedMarkLinkAsFavorite(int Id);
-public record RemovedLink(int Id);
+public record CreatedLink(Guid Id, string Name, string Url, Guid GroupId);
+public record EditedLink(Guid Id, string Name, string Url, Guid GroupId);
+public record MarkedLinkAsFavorite(Guid Id, string Name, string Url);
+public record RemovedMarkLinkAsFavorite(Guid Id);
+public record RemovedLink(Guid Id);
 
-public record CreatedGroup(int Id, string Name, int ParentGroupId);
-public record ChangedGroupName(int Id, string Name);
-public record RemovedGroup(int Id);
+public record CreatedGroup(Guid Id, string Name, Guid ParentGroupId);
+public record ChangedGroupName(Guid Id, string Name);
+public record RemovedGroup(Guid Id);
 
-public record Import(List<JsonGroup> Groups);
-public class ExportToClipboard : AsyncRequestMessage<List<JsonGroup>>{}
-public class ExportToShareServer : AsyncRequestMessage<List<JsonGroup>>
+public record Import(JsonData Data);
+public class ExportToClipboard : AsyncRequestMessage<JsonData>{}
+public class ExportToShareServer : AsyncRequestMessage<JsonData>
 {
     public required string ClientId { get; init; }
 }
-public class PrepareExportingData : AsyncRequestMessage<List<JsonGroup>> { }
+public class PrepareExportingData : AsyncRequestMessage<JsonData> { }
 
 public record DataExported(string ExportTarget, string TargetClientId = default);
 public record DataImported;

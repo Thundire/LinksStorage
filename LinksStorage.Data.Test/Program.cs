@@ -10,7 +10,7 @@ await storage.Initialize();
 
 Faker faker = new();
 
-var rootGroupId = 1;
+var rootGroupId = Guid.Parse("49c1c87d-1f05-450e-b830-75ea36468d71");
 // add groups to root
 var secondGroupId = await storage.AddGroup(faker.Internet.DomainWord(), rootGroupId);
 var thirdGroupId = await storage.AddGroup(faker.Internet.DomainWord(), rootGroupId);

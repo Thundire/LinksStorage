@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LinksStorage.Data.Test", "L
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LinksStorage.ShareServer", "LinksStorage.ShareServer\LinksStorage.ShareServer.csproj", "{F7E26446-5AD8-4FC3-9D0E-9DC27F7834A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinksStorage.Shared", "LinksStorage.Shared\LinksStorage.Shared.csproj", "{69178EC4-8CD8-4DDD-842F-5FEBBBDE4908}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LinksStorage.Shared", "LinksStorage.Shared\LinksStorage.Shared.csproj", "{69178EC4-8CD8-4DDD-842F-5FEBBBDE4908}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

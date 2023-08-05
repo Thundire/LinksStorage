@@ -21,7 +21,7 @@ public partial class ImportVM : ObservableObject
     {
         if (Value is not { Length: > 2 }) return;
 
-        var data = JsonSerializer.Deserialize<List<JsonGroup>>(Value);
+        var data = JsonSerializer.Deserialize<JsonData>(Value);
         _messenger.Send(new Import(data));
 
         await Shell.Current.GoToAsync("..");
