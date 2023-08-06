@@ -1,0 +1,25 @@
+﻿@page "/"
+@inject ILogger logger
+
+<PageTitle>Home page</PageTitle>
+
+<section>
+    <article>
+        <h1>
+            Build something beautiful
+        </h1>
+        <p>
+            Spark picks up where ASP.NET leaves off. Build production ready, full-stack web applications fast.
+        </p>
+        <p>
+            View the <a href="https://spark-framework.net" target="_blank"><strong>documentation →</strong></a>
+        </p>
+    </article>
+</section>
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        logger.Information($"Initialized at {DateTime.Now}");
+    }
+}
