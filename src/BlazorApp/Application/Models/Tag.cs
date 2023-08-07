@@ -1,8 +1,9 @@
-﻿namespace LinksStorage.Data;
+﻿using Spark.Library.Database;
 
-public class Tag
+namespace LinksStorage.BlazorApp.Application.Models;
+
+public class Tag : BaseModel
 {
-	public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public List<TagCategory> Categories { get; set; } = new();
     public List<Link> Links { get; set; } = new();
