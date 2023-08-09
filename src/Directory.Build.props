@@ -1,7 +1,0 @@
-<Project>
-  <PropertyGroup>
-    <ProjectsFamilyName>LinksStorage</ProjectsFamilyName>
-    <AssemblyName>$(ProjectsFamilyName).$(MSBuildProjectName)</AssemblyName>
-    <RootNamespace>$(ProjectsFamilyName).$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-  </PropertyGroup>
-</Project>
