@@ -62,7 +62,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
 	</ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\LinksStorage.Data\LinksStorage.Data.csproj" />
+    <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
+    <PackageReference Include="SQLitePCLRaw.provider.dynamic_cdecl" Version="2.1.4" />
   </ItemGroup>
-
 </Project>
