@@ -1,0 +1,20 @@
+﻿@page "/dashboard"
+@attribute [Authorize]
+
+<PageTitle>Dashboard</PageTitle>
+
+<section>
+    <h1>
+        Dashboard
+    </h1>
+    <article>
+        <p>
+            You're logged in!
+        </p>
+    </article>
+</section>
+@code {
+    [CascadingParameter]
+    public MainLayout? Layout { get; set; }
+    private User? user => Layout.User;
+}

@@ -1,0 +1,24 @@
+@page "/tags/management"
+@inject TagsRepository TagsRepository
+
+<ul class="tags">
+	@foreach (var tag in Tags)
+	{
+		<li class="tag">@tag.Name <a type="button" @onclick="() => Destroy(tag)">X</a></li>
+	}
+</ul>
+
+@code {
+	private List<Tag> Tags { get; set; } = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		Tags = await TagsRepository.Query();
+	}
+
+	private async Task Destroy(Tag tag)
+	{
+		await TagsRepository.Destroy(tag);
+		Tags.Remove(tag);
+	}
+}

@@ -9,11 +9,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LinksStorage", "LinksStorage\LinksStorage.csproj", "{368B28E0-A04A-4D72-8598-DC39770451B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LinksStorage.BlazorApp", "LinksStorage.BlazorApp\LinksStorage.BlazorApp.csproj", "{02DE49E6-8959-4A5B-A4A9-761DD2DF044D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LinksStorage.Data", "LinksStorage.Data\LinksStorage.Data.csproj", "{3A5E7019-C759-4635-9F22-C84C38DFD097}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LinksStorage.Data.Test", "LinksStorage.Data.Test\LinksStorage.Data.Test.csproj", "{20A4C3BF-197D-477A-B9B1-DBD038FAB77B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LinksStorage", "LinksStorage.MauiApp\LinksStorage.csproj", "{7636C57A-701D-4313-98A2-538B8AEFFDE2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,20 +19,16 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{368B28E0-A04A-4D72-8598-DC39770451B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{368B28E0-A04A-4D72-8598-DC39770451B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{368B28E0-A04A-4D72-8598-DC39770451B8}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{368B28E0-A04A-4D72-8598-DC39770451B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{368B28E0-A04A-4D72-8598-DC39770451B8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{368B28E0-A04A-4D72-8598-DC39770451B8}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{3A5E7019-C759-4635-9F22-C84C38DFD097}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3A5E7019-C759-4635-9F22-C84C38DFD097}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3A5E7019-C759-4635-9F22-C84C38DFD097}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3A5E7019-C759-4635-9F22-C84C38DFD097}.Release|Any CPU.Build.0 = Release|Any CPU
-		{20A4C3BF-197D-477A-B9B1-DBD038FAB77B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{20A4C3BF-197D-477A-B9B1-DBD038FAB77B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{20A4C3BF-197D-477A-B9B1-DBD038FAB77B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{20A4C3BF-197D-477A-B9B1-DBD038FAB77B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02DE49E6-8959-4A5B-A4A9-761DD2DF044D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02DE49E6-8959-4A5B-A4A9-761DD2DF044D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02DE49E6-8959-4A5B-A4A9-761DD2DF044D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02DE49E6-8959-4A5B-A4A9-761DD2DF044D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7636C57A-701D-4313-98A2-538B8AEFFDE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7636C57A-701D-4313-98A2-538B8AEFFDE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7636C57A-701D-4313-98A2-538B8AEFFDE2}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{7636C57A-701D-4313-98A2-538B8AEFFDE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7636C57A-701D-4313-98A2-538B8AEFFDE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7636C57A-701D-4313-98A2-538B8AEFFDE2}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

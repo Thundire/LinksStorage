@@ -1,0 +1,73 @@
+﻿@typeparam TItem
+
+<div class="autocomplete" @onfocusin="ShowItems" @onfocusout="HideItems">
+	<input type="text" @bind-value="filter" @bind-value:event="oninput" autocomplete="off" aria-autocomplete="none" class="form-control filter" />
+	@if (Items is not null && IsShowItems)
+	{
+		<small><button type="button" class="outline hide-btn" @onclick="HideItems">Hide</button></small>
+		<ul class="options">
+			<li class="option create" @onclick="Create">Create</li>
+			@if (FilteredItems.Any())
+			{
+				@foreach (var item in FilteredItems)
+				{
+					<li class="option" @onclick=@(() => Select(item))>
+						<span class="option-text">@DisplayTextSelector(item)</span>
+					</li>
+				}
+			}
+		</ul>
+	}
+</div>
+
+@code {
+	[Parameter]
+	public Func<TItem, string, bool> Filter { get; set; }
+	[Parameter]
+	public Func<TItem, string> DisplayTextSelector { get; set; }
+	[Parameter]
+	public EventCallback<TItem> OnSelected { get; set; }
+	[Parameter]
+	public EventCallback<string> OnCreateCalled { get; set; }
+	[Parameter]
+	public List<TItem>? Items { get; set; }
+	string filter = string.Empty;
+	List<TItem>? FilteredItems => Items.Where(x => Filter(x, filter)).ToList();
+	private bool IsShowItems { get; set; }
+	private bool IsClosing { get; set; }
+
+	private async Task Select(TItem item)
+	{
+		if (OnSelected.HasDelegate)
+		{
+			await OnSelected.InvokeAsync(item);
+		}
+		IsClosing = false;
+	}
+
+	private void ShowItems()
+	{
+		IsShowItems = true;
+	}
+
+	private async Task HideItems()
+	{
+		IsClosing = true;
+		await Task.Delay(100);
+		if(IsClosing)IsShowItems = false;
+	}
+
+	private void Hide()
+	{
+		IsShowItems = false;
+	}
+
+	private async Task Create()
+	{
+		if (OnCreateCalled.HasDelegate)
+		{
+			await OnCreateCalled.InvokeAsync(filter);
+		}
+	}
+
+}
