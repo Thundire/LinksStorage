@@ -41,6 +41,8 @@ public static class AppServiceRegistration
 		services.AddScoped<RolesService>();
 		services.AddScoped<IAuthValidator, AuthValidator>();
 		services.AddScoped<AuthService>();
+		services.AddScoped<LinksRepository>();
+		services.AddScoped<TagsRepository>();
 		return services;
 	}
 
