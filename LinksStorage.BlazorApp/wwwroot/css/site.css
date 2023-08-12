@@ -1,3 +1,33 @@
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: start;
+}
+
+.tag {
+    list-style: none;
+    border: .2rem solid white;
+    border-radius: 5rem;
+    padding: 0em .4em;
+    margin-right: .2em;
+    text-align: center;
+    justify-items: center;
+    line-height: 2rem
+}
+
+.tag > a {
+    border-radius: 5rem;
+    text-decoration: none;
+    font-size: .8rem;
+    padding: 0 .4rem;
+    line-height: 1rem;
+    font-weight: bold;
+}
+	.tag > a:hover {
+        background-color: #ba2f2f;
+        color: black;
+	}
+
 .validation-summary-errors ul li {
 	color: red;
 }
