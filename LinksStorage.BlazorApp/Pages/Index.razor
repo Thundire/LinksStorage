@@ -1,25 +1,153 @@
 ﻿@page "/"
-@inject ILogger logger
+@inject ILogger Logger
+@inject LinksRepository LinksRepository
+@inject TagsRepository TagsRepository
+@inject NavigationManager Nav
+
+
 
 <PageTitle>Home page</PageTitle>
 
-<section>
-    <article>
-        <h1>
-            Build something beautiful
-        </h1>
-        <p>
-            Spark picks up where ASP.NET leaves off. Build production ready, full-stack web applications fast.
-        </p>
-        <p>
-            View the <a href="https://spark-framework.net" target="_blank"><strong>documentation →</strong></a>
-        </p>
-    </article>
-</section>
-@code {
+<div class="grid" style="align-items: start; grid-template-columns: 3fr 2fr">
+	<table role="grid">
+		<thead>
+		<tr>
+			<th scope="col" style="width: 10%"></th>
+			<th scope="col" style="width: 30%">Name</th>
+			<th scope="col">Tags</th>
+			<th scope="col" style="width: 10%"></th>
+		</tr>
+		</thead>
+		<tbody>
+		@foreach (var link in _tableLinks)
+		{
+			<tr @onclick="() => SelectLink(link)">
+				<th scope="row">@link.Favorite</th>
+				<td data-tooltip="@link.Uri" data-placement="bottom">@link.Name</td>
+				<td>
+					@foreach (var tag in link.Tags)
+					{
+						<span>@tag.Name</span>
+					}
+				</td>
+				<td><button type="button" class="contrast" style="background-color: rgb(209, 78, 78)" @onclick="() => Destroy(link)">Delete</button></td>
+			</tr>
+		}
+		</tbody>
+	</table>
+	
+	<article style="padding: 2rem 2rem 2rem; margin-top: 0px">
+		<EditForm Model="CurrentLink" OnSubmit="CreateOrUpdateLink">
+			<label>Name</label>
+			<InputText @bind-Value="CurrentLink.Name"></InputText>
+			<label>Uri</label>
+			<InputText @bind-Value="CurrentLink.Uri"></InputText>
+			<div class="grid">
+				<button type="submit">@(IsCreating ? "Add" : "Update")</button>
+				<button type="button" class="secondary" @onclick="Clear">Clear</button>
+				<button type="button" class="contrast" style="background-color: rgb(209, 78, 78)" @onclick="() => Destroy()">Delete</button>
+			</div>
+		</EditForm>
+		
+		<div class="grid">
+			<ul class="tags">
+				@foreach (var tag in CurrentLink.Tags)
+				{
+					<li class="tag">@tag.Name <a type="button" @onclick="() => Remove(tag)">X</a></li>
+				}
+			</ul>
+		
+			<SearchBox TItem="Tag" Items="Tags" DisplayTextSelector="t => t.Name" Filter="(t, s) => t.Name.Contains(s.ToLower(), StringComparison.OrdinalIgnoreCase)" OnSelected="OnSelect" OnCreateCalled="CreateTag"/>
+		</div>
+		
+	</article>
+</div>
 
-    protected override async Task OnInitializedAsync()
-    {
-        logger.Information($"Initialized at {DateTime.Now}");
-    }
+
+
+@code {
+	[CascadingParameter]
+	public MainLayout? Layout { get; set; }
+
+	public User? User => Layout?.User;
+
+	private List<Link> _tableLinks = new();
+	private Link CurrentLink { get; set; } = new();
+	private bool IsCreating => CurrentLink.Id == 0;
+	private List<Tag> Tags { get; set; } = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		Logger.Information($"Initialized at {DateTime.Now}");
+		_tableLinks = await LinksRepository.Query();
+		Tags = await TagsRepository.Query();
+	}
+
+	private async Task CreateOrUpdateLink()
+	{
+		if (IsCreating)
+		{
+			var newLink = CurrentLink;
+			CurrentLink = new();
+			newLink.CreatedAt = DateTime.UtcNow;
+			newLink.UserId = User.Id;
+			await LinksRepository.Store(newLink);
+		}
+		else
+		{
+			CurrentLink.UpdatedAt = DateTime.UtcNow;
+			await LinksRepository.Update(CurrentLink);
+		}
+
+		Nav.NavigateTo("", true);
+	}
+
+	private void SelectLink(Link link)
+	{
+		CurrentLink = link;
+	}
+
+	private void Clear()
+	{
+		CurrentLink = new();
+	}
+
+	private async Task Destroy(Link? link = default)
+	{
+		Link? linkToDestroy = default;
+		if (link is not null) linkToDestroy = link;
+		if (CurrentLink.Id != 0) linkToDestroy = CurrentLink;
+
+		if (linkToDestroy is null) return;
+
+		await LinksRepository.Destroy(linkToDestroy);
+		_tableLinks.Remove(linkToDestroy);
+
+		if (linkToDestroy == CurrentLink) CurrentLink = new();
+	}
+
+	private void OnSelect(Tag selected)
+	{
+		if(CurrentLink.Tags.Any(x => string.Equals(x.Name, selected.Name, StringComparison.InvariantCultureIgnoreCase))) return;
+		CurrentLink.Tags.Add(selected);
+	}
+
+	private async Task CreateTag(string name)
+	{
+		if(name is not {Length: > 0}) return;
+		if (Tags.Any(x => string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase))) return;
+		var created = await TagsRepository.Store(new()
+			{
+				CreatedAt = DateTime.UtcNow,
+				Name = name
+			});
+		Tags.Add(created);
+		CurrentLink.Tags.Add(created);
+	}
+
+	private void Remove(Tag tag)
+	{
+		CurrentLink.Tags.Remove(tag);
+	}
+
 }
