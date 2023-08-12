@@ -1,0 +1,48 @@
+﻿
+.autocomplete {
+    position: relative;
+}
+.hide-btn {
+    padding: .1rem;
+    margin-bottom: 0;
+}
+
+.autocomplete .options {
+    position: absolute;
+    top: 110px;
+    left: 0;
+    background: var(--background-color);
+    width: 100%;
+    padding: 0;
+    z-index: 10;
+    border: 1px solid #ced4da;
+    border-radius: 0.5rem;
+    box-shadow: 0 30px 25px 8px rgba(0, 0, 0, 0.1);
+}
+    .autocomplete .options .create {
+        background-color: var(--secondary);
+        border-radius: .43rem .43rem 0 0;
+    }
+.autocomplete .option {
+    display: block;
+    padding: 0.25rem;
+}
+    
+.autocomplete .option .option-text {
+    padding: 0.25rem 0.5rem;
+}
+
+.autocomplete .option:hover {
+    background: #1E90FF;
+    color: #fff;
+}
+
+.autocomplete .option.disabled {
+    background-color: lightgrey;
+    cursor: not-allowed;
+}
+
+.autocomplete .option.disabled:hover {
+    background: lightgrey;
+    color: var(--bs-body);
+}
