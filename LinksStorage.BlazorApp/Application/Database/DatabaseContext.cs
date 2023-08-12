@@ -14,7 +14,6 @@ public class DatabaseContext : DbContext
 	public virtual DbSet<UserRole> UserRoles { get; set; }
 	public virtual DbSet<Link> Links { get; set; }
 	public virtual DbSet<Tag> Tags { get; set; }
-	public virtual DbSet<TagCategory> TagCategories { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder builder)
 	{
@@ -50,20 +49,5 @@ public class DatabaseContext : DbContext
 			new Role { Id = 1, Name = CustomRoles.User },
 			new Role { Id = 2, Name = CustomRoles.Admin }
 		);
-
-		builder.Entity<Link>(entity =>
-		{
-			entity.HasOne(p => p.User).WithMany().HasForeignKey(p => p.UserId).OnDelete(DeleteBehavior.NoAction);
-		});
-
-		builder.Entity<Tag>(entity =>
-		{
-			entity.HasOne(p => p.User).WithMany().HasForeignKey(p => p.UserId).OnDelete(DeleteBehavior.NoAction);
-		});
-
-		builder.Entity<TagCategory>(entity =>
-		{
-			entity.HasOne(p => p.User).WithMany().HasForeignKey(p => p.UserId).OnDelete(DeleteBehavior.Cascade);
-		});
 	}
 }
