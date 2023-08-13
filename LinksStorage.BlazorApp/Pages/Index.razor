@@ -3,6 +3,7 @@
 @inject LinksRepository LinksRepository
 @inject TagsRepository TagsRepository
 @inject NavigationManager Nav
+@inject IJSRuntime JSRuntime
 
 <PageTitle>Home page</PageTitle>
 
@@ -13,7 +14,7 @@
 			<th scope="col" style="width: 10%"></th>
 			<th scope="col" style="width: 30%">Name</th>
 			<th scope="col">Tags</th>
-			<th scope="col" style="width: 10%"></th>
+			<th scope="col" style="width: 20%"></th>
 		</tr>
 		</thead>
 		<tbody>
@@ -30,7 +31,12 @@
 						}
 					</ul>
 				</td>
-				<td><button type="button" class="contrast" style="background-color: rgb(209, 78, 78)" @onclick="() => Destroy(link)">Delete</button></td>
+				<td>
+					<div class="grid">
+						<button type="button" class="secondary" style="padding: .1rem; margin-bottom: 0;" @onclick="() => Navigate(link)">Open</button>
+						<button type="button" class="contrast" style="background-color: rgb(209, 78, 78);padding: .1rem; margin-bottom: 0;" @onclick="() => Destroy(link)">Delete</button>
+					</div>
+				</td>
 			</tr>
 		}
 		</tbody>
@@ -149,6 +155,12 @@
 	private void Remove(Tag tag)
 	{
 		CurrentLink.Tags.Remove(tag);
+	}
+
+	private async Task Navigate(Link link)
+	{
+		if(link.Uri is not {Length: > 0 }) return;
+		await JSRuntime.InvokeVoidAsync("open", link.Uri, "_blank");
 	}
 
 }
