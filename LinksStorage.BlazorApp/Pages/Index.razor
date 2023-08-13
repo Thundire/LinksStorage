@@ -25,10 +25,12 @@
 				<th scope="row">@link.Favorite</th>
 				<td data-tooltip="@link.Uri" data-placement="bottom">@link.Name</td>
 				<td>
-					@foreach (var tag in link.Tags)
-					{
-						<span>@tag.Name</span>
-					}
+					<ul class="tags">
+						@foreach (var tag in link.Tags)
+						{
+							<li class="tag">@tag.Name</li>
+						}
+					</ul>
 				</td>
 				<td><button type="button" class="contrast" style="background-color: rgb(209, 78, 78)" @onclick="() => Destroy(link)">Delete</button></td>
 			</tr>
