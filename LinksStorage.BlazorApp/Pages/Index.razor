@@ -4,8 +4,6 @@
 @inject TagsRepository TagsRepository
 @inject NavigationManager Nav
 
-
-
 <PageTitle>Home page</PageTitle>
 
 <div class="grid" style="align-items: start; grid-template-columns: 3fr 2fr">
@@ -87,26 +85,27 @@
 
 	private async Task CreateOrUpdateLink()
 	{
+		Link linkOnEdit = CurrentLink;
 		if (IsCreating)
 		{
-			var newLink = CurrentLink;
-			CurrentLink = new();
-			newLink.CreatedAt = DateTime.UtcNow;
-			newLink.UserId = User.Id;
-			await LinksRepository.Store(newLink);
+			linkOnEdit.CreatedAt = DateTime.UtcNow;
+			linkOnEdit.UserId = User.Id;
 		}
 		else
 		{
-			CurrentLink.UpdatedAt = DateTime.UtcNow;
-			await LinksRepository.Update(CurrentLink);
+			linkOnEdit.UpdatedAt = DateTime.UtcNow;
 		}
+		Link stored = await LinksRepository.StoreOrUpdate(linkOnEdit);
 
-		Nav.NavigateTo("", true);
+		if (IsCreating) _tableLinks.Add(stored);
+		else stored.Copy(_tableLinks.First(x => x.Id == stored.Id));
+
+		CurrentLink = new();
 	}
 
 	private void SelectLink(Link link)
 	{
-		CurrentLink = link;
+		link.Copy(CurrentLink);
 	}
 
 	private void Clear()

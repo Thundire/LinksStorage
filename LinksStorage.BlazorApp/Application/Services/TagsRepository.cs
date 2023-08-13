@@ -18,7 +18,7 @@ public class TagsRepository
 	public async Task<List<Tag>> Query(Expression<Func<Tag, bool>>? query = null)
 	{
 		await using DatabaseContext context = await _factory.CreateDbContextAsync();
-		var set = context.Tags.AsQueryable().AsNoTracking();
+		var set = context.Tags.AsNoTracking();
 		if (query is not null) set = set.Where(query);
 		return await set.ToListAsync();
 	}
@@ -26,7 +26,7 @@ public class TagsRepository
 	public async Task<Tag?> Query(int id, Expression<Func<Tag, bool>>? query = null)
 	{
 		await using DatabaseContext context = await _factory.CreateDbContextAsync();
-		var set = context.Tags.AsQueryable().AsNoTracking();
+		var set = context.Tags.AsNoTracking();
 		if (query is not null) set = set.Where(query);
 		return await set.FirstOrDefaultAsync(x => x.Id == id);
 	}

@@ -49,5 +49,12 @@ public class DatabaseContext : DbContext
 			new Role { Id = 1, Name = CustomRoles.User },
 			new Role { Id = 2, Name = CustomRoles.Admin }
 		);
+
+		builder.Entity<Link>(entity =>
+		{
+			entity.HasMany(x => x.Tags).WithMany();
+			entity.Navigation(x => x.Tags).AutoInclude();
+		});
+		
 	}
 }
