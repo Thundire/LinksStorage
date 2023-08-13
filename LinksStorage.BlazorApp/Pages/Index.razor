@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 @inject ILogger Logger
 @inject LinksRepository LinksRepository
 @inject TagsRepository TagsRepository
@@ -81,7 +81,7 @@
 	protected override async Task OnInitializedAsync()
 	{
 		Logger.Information($"Initialized at {DateTime.Now}");
-		_tableLinks = await LinksRepository.Query();
+		_tableLinks = (await LinksRepository.Query()).OrderByDescending(x=>x.CreatedAt).ToList();
 		Tags = await TagsRepository.Query();
 	}
 
