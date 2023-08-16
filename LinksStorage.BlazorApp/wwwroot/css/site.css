@@ -1,3 +1,8 @@
+article {
+	--block-spacing-vertical: calc(var(--spacing) * 2);
+    --block-spacing-horizontal: calc(var(--spacing) * 2);
+}
+
 .tags {
     display: flex;
     flex-wrap: wrap;
