@@ -8,40 +8,62 @@
 <PageTitle>Home page</PageTitle>
 
 <div class="grid" style="align-items: start; grid-template-columns: 3fr 2fr">
-	<table role="grid">
-		<thead>
-		<tr>
-			<th scope="col" style="width: 10%"></th>
-			<th scope="col" style="width: 30%">Name</th>
-			<th scope="col">Tags</th>
-			<th scope="col" style="width: 20%"></th>
-		</tr>
-		</thead>
-		<tbody>
-		@foreach (var link in _tableLinks)
-		{
-			<tr @onclick="() => SelectLink(link)">
-				<th scope="row">@link.Favorite</th>
-				<td data-tooltip="@link.Uri" data-placement="bottom">@link.Name</td>
-				<td>
-					<ul class="tags">
-						@foreach (var tag in link.Tags)
-						{
-							<li class="tag">@tag.Name</li>
-						}
-					</ul>
-				</td>
-				<td>
-					<div class="grid">
-						<button type="button" class="secondary" style="padding: .1rem; margin-bottom: 0;" @onclick="() => Navigate(link)">Open</button>
-						<button type="button" class="contrast" style="background-color: rgb(209, 78, 78);padding: .1rem; margin-bottom: 0;" @onclick="() => Destroy(link)">Delete</button>
-					</div>
-				</td>
-			</tr>
-		}
-		</tbody>
-	</table>
-	
+	<section>
+		<article style="margin-top: 0">
+			<input type="text" @bind-value="FilterText" @bind-value:event="oninput" />
+			<div class="grid">
+				<ul class="tags">
+					@foreach (var tag in FilterTags)
+					{
+						<li class="tag">@tag.Name <a type="button" @onclick="() => RemoveFromFilter(tag)">X</a></li>
+					}
+				</ul>
+				<div style="justify-self: end">
+					<SearchBox TItem="Tag" Items="FilterTagsDelta"
+					           DisplayTextSelector="t => t.Name" 
+					           Filter="(t, s) => t.Name.Contains(s.ToLower(), StringComparison.OrdinalIgnoreCase)" 
+					           OnSelected="OnSelectFilter" OnCreateCalled="CreateTagFilter" />
+				</div>
+			</div>
+		</article>
+
+		<article>
+			<table role="grid">
+				<thead>
+					<tr>
+						<th scope="col" style="width: 10%"></th>
+						<th scope="col" style="width: 30%">Name</th>
+						<th scope="col">Tags</th>
+						<th scope="col" style="width: 20%"></th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var link in FilteredLinks)
+					{
+						<tr @onclick="() => SelectLink(link)">
+							<th scope="row">@link.Favorite</th>
+							<td data-tooltip="@link.Uri" data-placement="bottom">@link.Name</td>
+							<td>
+								<ul class="tags">
+									@foreach (var tag in link.Tags)
+									{
+										<li class="tag">@tag.Name</li>
+									}
+								</ul>
+							</td>
+							<td>
+								<div class="grid">
+									<button type="button" class="secondary" style="padding: .1rem; margin-bottom: 0;" @onclick="() => Navigate(link)">Open</button>
+									<button type="button" class="contrast" style="background-color: rgb(209, 78, 78); padding: .1rem; margin-bottom: 0;" @onclick="() => Destroy(link)">Delete</button>
+								</div>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</article>
+	</section>
+
 	<article style="padding: 2rem 2rem 2rem; margin-top: 0px">
 		<EditForm Model="CurrentLink" OnSubmit="CreateOrUpdateLink">
 			<label>Name</label>
@@ -54,7 +76,7 @@
 				<button type="button" class="contrast" style="background-color: rgb(209, 78, 78)" @onclick="() => Destroy()">Delete</button>
 			</div>
 		</EditForm>
-		
+
 		<div class="grid">
 			<ul class="tags">
 				@foreach (var tag in CurrentLink.Tags)
@@ -62,10 +84,10 @@
 					<li class="tag">@tag.Name <a type="button" @onclick="() => Remove(tag)">X</a></li>
 				}
 			</ul>
-		
-			<SearchBox TItem="Tag" Items="Tags" DisplayTextSelector="t => t.Name" Filter="(t, s) => t.Name.Contains(s.ToLower(), StringComparison.OrdinalIgnoreCase)" OnSelected="OnSelect" OnCreateCalled="CreateTag"/>
+
+			<SearchBox TItem="Tag" Items="EditFormTagsDelta" DisplayTextSelector="t => t.Name" Filter="(t, s) => t.Name.Contains(s.ToLower(), StringComparison.OrdinalIgnoreCase)" OnSelected="OnSelect" OnCreateCalled="CreateTag" />
 		</div>
-		
+
 	</article>
 </div>
 
@@ -78,14 +100,22 @@
 	public User? User => Layout?.User;
 
 	private List<Link> _tableLinks = new();
+	private List<Link> FilteredLinks => _tableLinks.Where(x =>
+		(string.IsNullOrEmpty(FilterText) || x.Name.Contains(FilterText) || x.Uri.Contains(FilterText))
+		&& (FilterTags.Count == 0 || x.Tags.Select(t => t.Id).Except(FilterTags.Select(t => t.Id)).ToArray().Length == x.Tags.Count - FilterTags.Count))
+		.ToList();
+	private string FilterText { get; set; } = string.Empty;
+	private List<Tag> FilterTags { get; } = new();
 	private Link CurrentLink { get; set; } = new();
 	private bool IsCreating => CurrentLink.Id == 0;
 	private List<Tag> Tags { get; set; } = new();
+	private List<Tag> EditFormTagsDelta => Tags.Except(CurrentLink.Tags).ToList();
+	private List<Tag> FilterTagsDelta => Tags.Except(FilterTags).ToList();
 
 	protected override async Task OnInitializedAsync()
 	{
 		Logger.Information($"Initialized at {DateTime.Now}");
-		_tableLinks = (await LinksRepository.Query()).OrderByDescending(x=>x.CreatedAt).ToList();
+		_tableLinks = (await LinksRepository.Query()).OrderByDescending(x => x.CreatedAt).ToList();
 		Tags = await TagsRepository.Query();
 	}
 
@@ -135,21 +165,15 @@
 
 	private void OnSelect(Tag selected)
 	{
-		if(CurrentLink.Tags.Any(x => string.Equals(x.Name, selected.Name, StringComparison.InvariantCultureIgnoreCase))) return;
+		if (CurrentLink.Tags.Any(x => string.Equals(x.Name, selected.Name, StringComparison.InvariantCultureIgnoreCase))) return;
 		CurrentLink.Tags.Add(selected);
 	}
 
 	private async Task CreateTag(string name)
 	{
-		if(name is not {Length: > 0}) return;
-		if (Tags.Any(x => string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase))) return;
-		var created = await TagsRepository.Store(new()
-			{
-				CreatedAt = DateTime.UtcNow,
-				Name = name
-			});
-		Tags.Add(created);
-		CurrentLink.Tags.Add(created);
+		(bool success, Tag? created) = await StoreTag(name);
+		if (!success) return;
+		CurrentLink.Tags.Add(created!);
 	}
 
 	private void Remove(Tag tag)
@@ -159,8 +183,39 @@
 
 	private async Task Navigate(Link link)
 	{
-		if(link.Uri is not {Length: > 0 }) return;
+		if (link.Uri is not { Length: > 0 }) return;
 		await JSRuntime.InvokeVoidAsync("open", link.Uri, "_blank");
+	}
+
+	private void RemoveFromFilter(Tag tag)
+	{
+		FilterTags.Remove(tag);
+	}
+
+	private void OnSelectFilter(Tag selected)
+	{
+		if (FilterTags.Any(x => string.Equals(x.Name, selected.Name, StringComparison.InvariantCultureIgnoreCase))) return;
+		FilterTags.Add(selected);
+	}
+
+	private async Task CreateTagFilter(string name)
+	{
+		(bool success, Tag? created) = await StoreTag(name);
+		if (!success) return;
+		FilterTags.Add(created!);
+	}
+
+	private async ValueTask<(bool, Tag?)> StoreTag(string name)
+	{
+		if (name is not { Length: > 0 }) return (false, null);
+		if (Tags.Any(x => string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase))) return (false, null);
+		var created = await TagsRepository.Store(new()
+			{
+				CreatedAt = DateTime.UtcNow,
+				Name = name
+			});
+		Tags.Add(created);
+		return (true, created);
 	}
 
 }
