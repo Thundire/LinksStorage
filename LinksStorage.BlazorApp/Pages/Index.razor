@@ -133,7 +133,7 @@
 		}
 		Link stored = await LinksRepository.StoreOrUpdate(linkOnEdit);
 
-		if (IsCreating) _tableLinks.Add(stored);
+		if (IsCreating) _tableLinks.Insert(0, stored);
 		else stored.Copy(_tableLinks.First(x => x.Id == stored.Id));
 
 		CurrentLink = new();
