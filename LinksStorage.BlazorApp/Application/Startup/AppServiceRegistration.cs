@@ -9,20 +9,21 @@ using Coravel;
 using Microsoft.AspNetCore.Components.Authorization;
 using Spark.Library.Auth;
 using LinksStorage.BlazorApp.Application.Jobs;
+using Microsoft.Fast.Components.FluentUI;
 using Spark.Library.Mail;
 
 namespace LinksStorage.BlazorApp.Application.Startup;
 
 public static class AppServiceRegistration
 {
-	public static IServiceCollection AddAppServices(this IServiceCollection services, IConfiguration config)
+	public static void AddAppServices(this IServiceCollection services, IConfiguration config)
 	{
 		services.AddCustomServices();
 		services.AddRazorPages();
 		services.AddServerSideBlazor();
 		services.AddDatabase<DatabaseContext>(config);
 		services.AddLogger(config);
-		services.AddAuthorization(config, new string[] { CustomRoles.Admin, CustomRoles.User });
+		services.AddAuthorization(config, new[] { CustomRoles.Admin, CustomRoles.User });
 		services.AddAuthentication<IAuthValidator>(config);
 		services.AddScoped<AuthenticationStateProvider, SparkAuthenticationStateProvider>();
 		services.AddJobServices();
@@ -31,10 +32,10 @@ public static class AppServiceRegistration
 		services.AddEventServices();
 		services.AddEvents();
 		services.AddMailer(config);
-		return services;
+		services.AddFluentUI();
 	}
 
-	private static IServiceCollection AddCustomServices(this IServiceCollection services)
+	private static void AddCustomServices(this IServiceCollection services)
 	{
 		// add custom services
 		services.AddScoped<UsersService>();
@@ -43,20 +44,28 @@ public static class AppServiceRegistration
 		services.AddScoped<AuthService>();
 		services.AddScoped<LinksRepository>();
 		services.AddScoped<TagsRepository>();
-		return services;
 	}
 
-	private static IServiceCollection AddEventServices(this IServiceCollection services)
+	private static void AddEventServices(this IServiceCollection services)
 	{
 		// add custom events here
 		services.AddTransient<EmailNewUser>();
-		return services;
 	}
 
-	private static IServiceCollection AddJobServices(this IServiceCollection services)
+	private static void AddJobServices(this IServiceCollection services)
 	{
 		// add custom background tasks here
 		services.AddTransient<ExampleJob>();
-		return services;
+	}
+
+	private static void AddFluentUI(this IServiceCollection services)
+	{
+		services.AddFluentUIComponents(options =>
+		{
+			options.HostingModel       = BlazorHostingModel.Server;
+			options.IconConfiguration  = ConfigurationGenerator.GetIconConfiguration();
+			options.EmojiConfiguration = ConfigurationGenerator.GetEmojiConfiguration();
+		});
+		services.AddDataGridEntityFrameworkAdapter();
 	}
 }
