@@ -91,7 +91,7 @@ public class LinksRepository
 		}
 
 		await context.SaveChangesAsync();
-		return data;
+		return existedLink;
 	}
 
 	public async Task Destroy(Link data)
