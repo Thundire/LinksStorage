@@ -1,12 +1,14 @@
 @page "/tags/management"
 @inject TagsRepository TagsRepository
 
-<ul class="tags">
-	@foreach (var tag in Tags)
-	{
-		<li class="tag">@tag.Name <a type="button" @onclick="() => Destroy(tag)">X</a></li>
-	}
-</ul>
+<MudContainer>
+	<MudChipSet AllClosable="true" OnClose="Destroy">
+		@foreach (var tag in Tags)
+		{
+			<MudChip Value="tag">@tag.Name</MudChip>
+		}
+	</MudChipSet>
+</MudContainer>
 
 @code {
 	private List<Tag> Tags { get; set; } = new();
@@ -16,8 +18,9 @@
 		Tags = await TagsRepository.Query();
 	}
 
-	private async Task Destroy(Tag tag)
+	private async Task Destroy(MudChip chip)
 	{
+		if (chip.Value is not Tag tag) return;
 		await TagsRepository.Destroy(tag);
 		Tags.Remove(tag);
 	}

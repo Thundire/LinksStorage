@@ -7,90 +7,105 @@
 
 <PageTitle>Home page</PageTitle>
 
-<div class="grid" style="align-items: start; grid-template-columns: 3fr 2fr">
-	<section>
-		<article style="margin-top: 0">
-			<input type="text" @bind-value="FilterText" @bind-value:event="oninput" />
-			<div class="grid">
-				<ul class="tags">
-					@foreach (var tag in FilterTags)
-					{
-						<li class="tag">@tag.Name <a type="button" @onclick="() => RemoveFromFilter(tag)">X</a></li>
-					}
-				</ul>
-				<div style="justify-self: end">
-					<SearchBox TItem="Tag" Items="FilterTagsDelta"
-					           DisplayTextSelector="t => t.Name" 
-					           Filter="(t, s) => t.Name.Contains(s.ToLower(), StringComparison.OrdinalIgnoreCase)" 
-					           OnSelected="OnSelectFilter" OnCreateCalled="CreateTagFilter" />
-				</div>
-			</div>
-		</article>
+<MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="mt-2 pa-4">
+<MudGrid Justify="Justify.Center">
+	<MudItem xs="12" sm="7">
+		<MudGrid>
+			<MudItem xs="12">
+				<MudPaper Elevation="2" Class="pa-4">
+					<MudGrid>
+						<MudItem xs="8">
+							<MudChipSet AllClosable="true" OnClose="RemoveFromFilter">
+								@foreach (var tag in FilterTags)
+								{
+									<MudChip Value="tag">@tag.Name</MudChip>
+								}
+							</MudChipSet>
+						</MudItem>
+						<MudItem xs="4">
+							<SearchBox TItem="Tag" Items="FilterTagsDelta"
+							           DisplayTextSelector="t => t.Name"
+							           Filter="(t, s) => t.Name.Contains(s.ToLower(), StringComparison.OrdinalIgnoreCase)"
+							           OnSelected="OnSelectFilter" OnCreateCalled="CreateTagFilter" />
+						</MudItem>
+					</MudGrid>
+				</MudPaper>
+			</MudItem>
 
-		<article>
-			<table role="grid">
-				<thead>
-					<tr>
-						<th scope="col" style="width: 10%"></th>
-						<th scope="col" style="width: 30%">Name</th>
-						<th scope="col">Tags</th>
-						<th scope="col" style="width: 20%"></th>
-					</tr>
-				</thead>
-				<tbody>
-					@foreach (var link in FilteredLinks)
-					{
-						<tr @onclick="() => SelectLink(link)">
-							<th scope="row">@link.Favorite</th>
-							<td data-tooltip="@link.Uri" data-placement="bottom">@link.Name</td>
-							<td>
-								<ul class="tags">
-									@foreach (var tag in link.Tags)
+			<MudItem xs="12">
+				<MudDataGrid T="Link" MultiSelection="false" Items="@_tableLinks" SortMode="SortMode.Multiple" Filterable="true" Hideable="true"
+				             QuickFilter="@_quickFilter"
+				             RowClick="@SelectLink"
+				             Elevation="2" Class="pa-4" Virtualize FixedHeader Height="58rem">
+					<ToolBarContent>
+						<MudText Typo="Typo.h6">Links</MudText>
+						<MudSpacer />
+						<MudTextField @bind-Value="FilterText" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+						              AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+					</ToolBarContent>
+					<Columns>
+						@* <SelectColumn T="Link" /> *@
+						<PropertyColumn Property="x => x.Name" Title="Name" StickyLeft="true" CellStyle="width: 45%" Filterable="false" Sortable="false" />
+						<TemplateColumn Title="Tags" Filterable="false" Sortable="false">
+							<CellTemplate>
+
+								<MudChipSet>
+									@foreach (var tag in @context.Item.Tags)
 									{
-										<li class="tag">@tag.Name</li>
+										<MudChip OnClick="() => OnSelectFilter(tag)">@tag.Name</MudChip>
 									}
-								</ul>
-							</td>
-							<td>
-								<div class="grid">
-									<button type="button" class="secondary" style="padding: .1rem; margin-bottom: 0;" @onclick="() => Navigate(link)">Open</button>
-									<button type="button" class="contrast" style="background-color: rgb(209, 78, 78); padding: .1rem; margin-bottom: 0;" @onclick="() => Destroy(link)">Delete</button>
-								</div>
-							</td>
-						</tr>
-					}
-				</tbody>
-			</table>
-		</article>
-	</section>
+								</MudChipSet>
+							</CellTemplate>
+						</TemplateColumn>
+						<TemplateColumn Filterable="false" Sortable="false" StickyRight="true" CellStyle="width: 5%">
+							<CellTemplate>
+								<MudStack Row="true">
+									<MudButton Size="@Size.Small" Variant="Variant.Outlined" OnClick="() => Navigate(context.Item)">Open</MudButton>
+									<MudButton Size="@Size.Small" Color="Color.Error" Variant="Variant.Outlined" OnClick="() => Destroy(context.Item)">Delete</MudButton>
+								</MudStack>
+							</CellTemplate>
+						</TemplateColumn>
+					</Columns>
+					@* <PagerContent>
+						<MudDataGridPager T="Link" />
+					</PagerContent> *@
+				</MudDataGrid>
+			</MudItem>
+		</MudGrid>
+	</MudItem>
 
-	<article style="padding: 2rem 2rem 2rem; margin-top: 0px">
-		<EditForm Model="CurrentLink" OnSubmit="CreateOrUpdateLink">
-			<label>Name</label>
-			<InputText @bind-Value="CurrentLink.Name"></InputText>
-			<label>Uri</label>
-			<InputText @bind-Value="CurrentLink.Uri"></InputText>
-			<div class="grid">
-				<button type="submit">@(IsCreating ? "Add" : "Update")</button>
-				<button type="button" class="secondary" @onclick="Clear">Clear</button>
-				<button type="button" class="contrast" style="background-color: rgb(209, 78, 78)" @onclick="() => Destroy()">Delete</button>
-			</div>
-		</EditForm>
+	<MudItem xs="12" sm="3">
+		<MudPaper Class="pa-4">
+			<MudForm Model="CurrentLink" OnSubmit="CreateOrUpdateLink">
+				<MudTextField T="string" Label="Name" @bind-Value="CurrentLink.Name" />
+				<MudTextField T="string" Label="Url" @bind-Value="CurrentLink.Uri" />
+				<MudButtonGroup Class="mt-4 mb-2" OverrideStyles="false">
+					<MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="CreateOrUpdateLink">@(IsCreating ? "Add" : "Update")</MudButton>
+					<MudButton Color="Color.Info" Variant="Variant.Filled" OnClick="Clear">Clear</MudButton>
+					<MudButton Color="Color.Secondary" Variant="Variant.Filled" OnClick="() => Destroy()">Delete</MudButton>
+				</MudButtonGroup>
+			</MudForm>
 
-		<div class="grid">
-			<ul class="tags">
-				@foreach (var tag in CurrentLink.Tags)
-				{
-					<li class="tag">@tag.Name <a type="button" @onclick="() => Remove(tag)">X</a></li>
-				}
-			</ul>
-
-			<SearchBox TItem="Tag" Items="EditFormTagsDelta" DisplayTextSelector="t => t.Name" Filter="(t, s) => t.Name.Contains(s.ToLower(), StringComparison.OrdinalIgnoreCase)" OnSelected="OnSelect" OnCreateCalled="CreateTag" />
-		</div>
-
-	</article>
-</div>
-
+			<MudGrid>
+				<MudItem xs="8">
+					<MudChipSet AllClosable="true" OnClose="Remove">
+						@foreach (var tag in CurrentLink.Tags)
+						{
+							<MudChip Value="tag">@tag.Name</MudChip>
+						}
+					</MudChipSet>
+				</MudItem>
+				<MudItem xs="4">
+					<SearchBox TItem="Tag" Items="EditFormTagsDelta"
+					           DisplayTextSelector="t => t.Name"
+					           Filter="(t, s) => t.Name.Contains(s.ToLower(), StringComparison.OrdinalIgnoreCase)"
+					           OnSelected="OnSelect" OnCreateCalled="CreateTag" />
+				</MudItem>
+			</MudGrid>
+		</MudPaper>
+	</MudItem>
+</MudGrid>
+</MudContainer>
 
 
 @code {
@@ -100,10 +115,6 @@
 	public User? User => Layout?.User;
 
 	private List<Link> _tableLinks = new();
-	private List<Link> FilteredLinks => _tableLinks.Where(x =>
-		(string.IsNullOrEmpty(FilterText) || x.Name.Contains(FilterText) || x.Uri.Contains(FilterText))
-		&& (FilterTags.Count == 0 || x.Tags.Select(t => t.Id).Except(FilterTags.Select(t => t.Id)).ToArray().Length == x.Tags.Count - FilterTags.Count))
-		.ToList();
 	private string FilterText { get; set; } = string.Empty;
 	private List<Tag> FilterTags { get; } = new();
 	private Link CurrentLink { get; set; } = new();
@@ -111,6 +122,7 @@
 	private List<Tag> Tags { get; set; } = new();
 	private List<Tag> EditFormTagsDelta => Tags.Except(CurrentLink.Tags).ToList();
 	private List<Tag> FilterTagsDelta => Tags.Except(FilterTags).ToList();
+	private bool DrawerOpen { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -118,6 +130,16 @@
 		_tableLinks = (await LinksRepository.Query()).OrderByDescending(x => x.CreatedAt).ToList();
 		Tags = await TagsRepository.Query();
 	}
+
+	private Func<Link, bool> _quickFilter => x =>
+	{
+		var lowerFilterText = FilterText.ToLower();
+		if ((string.IsNullOrEmpty(FilterText) || x.Name.ToLower().Contains(lowerFilterText) || x.Uri.Contains(lowerFilterText))
+			&& (FilterTags.Count == 0 || x.Tags.Select(t => t.Id).Except(FilterTags.Select(t => t.Id)).ToArray().Length == x.Tags.Count - FilterTags.Count))
+			return true;
+
+		return false;
+	};
 
 	private async Task CreateOrUpdateLink()
 	{
@@ -139,9 +161,10 @@
 		CurrentLink = new();
 	}
 
-	private void SelectLink(Link link)
+	private void SelectLink(DataGridRowClickEventArgs<Link> args)
 	{
-		link.Copy(CurrentLink);
+		OpenDrawer(DrawerVariant.LinkAddOrEdit);
+		args.Item.Copy(CurrentLink);
 	}
 
 	private void Clear()
@@ -176,9 +199,9 @@
 		CurrentLink.Tags.Add(created!);
 	}
 
-	private void Remove(Tag tag)
+	private void Remove(MudChip chip)
 	{
-		CurrentLink.Tags.Remove(tag);
+		CurrentLink.Tags.Remove((Tag)chip.Value);
 	}
 
 	private async Task Navigate(Link link)
@@ -187,9 +210,9 @@
 		await JSRuntime.InvokeVoidAsync("open", link.Uri, "_blank");
 	}
 
-	private void RemoveFromFilter(Tag tag)
+	private void RemoveFromFilter(MudChip chip)
 	{
-		FilterTags.Remove(tag);
+		FilterTags.Remove((Tag)chip.Value);
 	}
 
 	private void OnSelectFilter(Tag selected)
@@ -216,6 +239,16 @@
 			});
 		Tags.Add(created);
 		return (true, created);
+	}
+
+	private enum DrawerVariant
+	{
+		LinkAddOrEdit
+	}
+
+	private void OpenDrawer(DrawerVariant variant)
+	{
+		DrawerOpen = true;
 	}
 
 }
