@@ -9,7 +9,6 @@ using Coravel;
 using Microsoft.AspNetCore.Components.Authorization;
 using Spark.Library.Auth;
 using LinksStorage.BlazorApp.Application.Jobs;
-using Microsoft.Fast.Components.FluentUI;
 using Spark.Library.Mail;
 
 namespace LinksStorage.BlazorApp.Application.Startup;
@@ -32,7 +31,7 @@ public static class AppServiceRegistration
 		services.AddEventServices();
 		services.AddEvents();
 		services.AddMailer(config);
-		services.AddFluentUI();
+		services.AddComponentsServices();
 	}
 
 	private static void AddCustomServices(this IServiceCollection services)
@@ -58,14 +57,8 @@ public static class AppServiceRegistration
 		services.AddTransient<ExampleJob>();
 	}
 
-	private static void AddFluentUI(this IServiceCollection services)
+	private static void AddComponentsServices(this IServiceCollection services)
 	{
-		services.AddFluentUIComponents(options =>
-		{
-			options.HostingModel       = BlazorHostingModel.Server;
-			options.IconConfiguration  = ConfigurationGenerator.GetIconConfiguration();
-			options.EmojiConfiguration = ConfigurationGenerator.GetEmojiConfiguration();
-		});
-		services.AddDataGridEntityFrameworkAdapter();
+		
 	}
 }
