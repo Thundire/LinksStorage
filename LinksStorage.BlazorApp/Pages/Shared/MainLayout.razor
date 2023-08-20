@@ -3,11 +3,17 @@
 
 <PageTitle>@Env.Get("APP_NAME")</PageTitle>
 
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
 <CascadingValue Value="this">
-    <NavMenu />
-    <main>
-        @Body
-    </main>
+	<MudLayout>
+		<NavMenu/>
+		<MudMainContent>
+			@Body
+		</MudMainContent>
+	</MudLayout>
 </CascadingValue>
 
 @code {

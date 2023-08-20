@@ -9,6 +9,7 @@ using Coravel;
 using Microsoft.AspNetCore.Components.Authorization;
 using Spark.Library.Auth;
 using LinksStorage.BlazorApp.Application.Jobs;
+using MudBlazor.Services;
 using Spark.Library.Mail;
 
 namespace LinksStorage.BlazorApp.Application.Startup;
@@ -59,6 +60,6 @@ public static class AppServiceRegistration
 
 	private static void AddComponentsServices(this IServiceCollection services)
 	{
-		
+		services.AddMudServices();
 	}
 }
