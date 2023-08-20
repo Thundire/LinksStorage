@@ -1,27 +1,27 @@
 ﻿@typeparam TItem
 
-<div class="autocomplete" @onfocusin="ShowItems" @onfocusout="HideItems">
+<div @onfocusin="ShowItems" @onfocusout="HideItems">
 	<MudStack Row="true">
-		<MudTextField T="string" @bind-value="filter" @bind-value:event="oninput" autocomplete="off" aria-autocomplete="none" class="form-control filter" />
+		<MudTextField T="string" @bind-value="filter" Immediate autocomplete="off" aria-autocomplete="none" />
 		@if (Items is not null && IsShowItems)
 		{
-			<MudButton Size="Size.Small" type="button" class="outline hide-btn" @onclick="HideItems">Hide</MudButton>
+			<MudButton Size="Size.Small" OnClick="HideItems">Hide</MudButton>
 		}
 	</MudStack>
 
 	<MudPopover Open="Items is not null && IsShowItems" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" RelativeWidth>
-		<MudButton @onclick="Create">Create</MudButton>
-			<MudList Clickable Dense Style="height: 300px; overflow: auto;">
-				@if (FilteredItems is { Count: > 0 })
+		<MudButton FullWidth OnClick="Create">Create</MudButton>
+		<MudList Clickable Dense Style="height: 300px; overflow: auto;">
+			@if (FilteredItems is { Count: > 0 })
+			{
+				@foreach (TItem item in FilteredItems)
 				{
-					@foreach (TItem item in FilteredItems)
-					{
-						<MudListItem OnClick="() => Select(item)">
-							@DisplayTextSelector(item)
-						</MudListItem>
-					}
+					<MudListItem OnClick="() => Select(item)">
+						@DisplayTextSelector(item)
+					</MudListItem>
 				}
-			</MudList>
+			}
+		</MudList>
 	</MudPopover>
 </div>
 
@@ -36,7 +36,7 @@
 	public EventCallback<string> OnCreateCalled { get; set; }
 	[Parameter]
 	public List<TItem>? Items { get; set; }
-	string filter = string.Empty;
+	private string filter { get; set; } = string.Empty;
 	List<TItem>? FilteredItems => Items.Where(x => Filter(x, filter)).ToList();
 	private bool IsShowItems { get; set; }
 	private bool IsClosing { get; set; }
