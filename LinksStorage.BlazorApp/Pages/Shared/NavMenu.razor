@@ -1,37 +1,26 @@
-﻿<nav class="container" x-data="{ desktopMenuOpen: false, mobileMenuOpen: false }">
-	<ul>
-		<li>
-			<a href="/" class="contrast">
-				<ApplicationLogo />
-			</a>
-		</li>
-	</ul>
-	<ul>
-		<li><a href="/tags/management">Tags</a></li>
-		<AuthorizeView>
-			<Authorized>
-				<li>
-					<details role="list" dir="rtl">
-						<summary aria-haspopup="listbox" role="link">@user.Name</summary>
-						<ul role="listbox">
-							<li><a href="/dashboard">Dashboard</a></li>
-							<li><a href="/profile/edit">Profile</a></li>
-							<li><a href="/logout">Logout</a></li>
-							<li><small>@user.Name</small></li>
-						</ul>
-					</details>
-				</li>
-			</Authorized>
-			<NotAuthorized>
-				<li><a href="/login">Login</a></li>
-				<li><a href="/register" role="button">Register</a></li>
-			</NotAuthorized>
-		</AuthorizeView>
-	</ul>
-</nav>
+﻿
+<MudAppBar Dense="true">
+	<MudButton Href="/"><ApplicationLogo/></MudButton >
+	<MudSpacer />
+	<MudButton Href="/tags/management">Tags</MudButton >
+	<AuthorizeView>
+		<Authorized>
+			<MudMenu Label="@(User?.Name ?? "NoName")">
+				<MudMenuItem Href="/dashboard">Dashboard</MudMenuItem >
+				<MudMenuItem Href="/profile/edit">Profile</MudMenuItem>
+				<MudMenuItem Href="/logout">Logout</MudMenuItem>
+			</MudMenu>
+		</Authorized>
+		<NotAuthorized>
+			<MudButton  Href="/login">Login</MudButton >
+			<MudButton  Href="/register">Register</MudButton >
+		</NotAuthorized>
+	</AuthorizeView>
+</MudAppBar>
+	
 
 @code {
 	[CascadingParameter]
 	public MainLayout? Layout { get; set; }
-	private User? user => Layout.User;
+	private User? User => Layout?.User;
 }
