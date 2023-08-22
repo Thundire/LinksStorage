@@ -3,7 +3,7 @@
 
 <PageTitle>@Env.Get("APP_NAME")</PageTitle>
 
-<MudThemeProvider @bind-IsDarkMode="DarkTheme"/>
+<MudThemeProvider @ref="_mudThemeProvider" @bind-IsDarkMode="DarkTheme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
@@ -17,23 +17,37 @@
 </CascadingValue>
 
 @code {
-    [CascadingParameter]
-    public Task<AuthenticationState> AuthenticationStateTask { get; set; }
-    public User? User = new User();
+
+	[CascadingParameter]
+	public Task<AuthenticationState> AuthenticationStateTask { get; set; } = null!;
+    public User? User = new();
     [CascadingParameter]
     public bool DarkTheme { get; set; }
 
+	private MudThemeProvider _mudThemeProvider = null!;
+
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateTask;
+        AuthenticationState authState = await AuthenticationStateTask;
 
-        if (authState.User.Identity.IsAuthenticated)
+        if (authState.User.Identity?.IsAuthenticated is true)
         {
             User = await authService.GetAuthenticatedUser();
         }
     }
 
-    private void SetThemeMode(bool darkMode)
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		await base.OnAfterRenderAsync(firstRender);
+
+		if (firstRender)
+		{
+			DarkTheme = await _mudThemeProvider.GetSystemPreference();
+			StateHasChanged();
+		}
+	}
+
+	private void SetThemeMode(bool darkMode)
     {
 	    DarkTheme = darkMode;
     }
