@@ -1,172 +1,132 @@
 ﻿@page "/profile/edit"
 @attribute [Authorize]
-@inject IDbContextFactory<DatabaseContext> factory
-@inject NavigationManager _navManager
-@inject UsersService _usersService
+@inject IDbContextFactory<DatabaseContext> Factory
+@inject NavigationManager NavManager
+@inject UsersService UsersService
 
 <PageTitle>Edit Profile</PageTitle>
 
-<section>
-    <h1>
-        Profile
-    </h1>
-    <article>
-        <h2>
-            Profile Information
-        </h2>
-        <p>
-            Update your account's profile information.
-        </p>
-        <EditForm Model="profileInformationForm" OnValidSubmit="SaveProfileInformation">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
-            <div>
-                <label for="name">Name</label>
-                <InputText @bind-Value="profileInformationForm.Name" id="name" />
-                <small>
-                    <ValidationMessage For="() => profileInformationForm.Name" />
-                </small>
-            </div>
-            <div>
-                <label for="email">Email address</label>
-                <InputText @bind-Value="profileInformationForm.Email" type="email" id="email" />
-                <small>
-                    <ValidationMessage For="() => profileInformationForm.Email" />
-                    @if (!String.IsNullOrEmpty(profileFormMessage))
-                    {
-                        @profileFormMessage
-                    }
-                </small>
-            </div>
-            <div class="grid">
-                <button type="submit">
-                    Save
-                </button>
-            </div>
-        </EditForm>
-    </article>
-    <article>
-        <h2>
-            Update Password
-        </h2>
-        <p>
-            Update your accounts current password.
-        </p>
-        <EditForm Model="passwordForm" OnValidSubmit="UpdatePassword">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
-            <div>
-                <label for="current-password">Current Password</label>
-                <InputText @bind-Value="passwordForm.CurrentPassword" type="password" id="current-password" />
-                <small>
-                    <ValidationMessage For="() => passwordForm.CurrentPassword" />
-                    @if (!String.IsNullOrEmpty(passwordFormMessage))
-                    {
-                        @passwordFormMessage
-                    }
-                </small>
-            </div>
-            <div>
-                <label for="new-password">New Password</label>
-                <InputText @bind-Value="passwordForm.NewPassword" type="password" id="new-password" />
-                <small>
-                    <ValidationMessage For="() => passwordForm.NewPassword" />
-                </small>
-            </div>
-            <div>
-                <label for="confirm-password">Confirm Password</label>
-                <InputText @bind-Value="passwordForm.ConfirmPassword" type="password" id="confirm-password" />
-                <small>
-                    <ValidationMessage For="() => passwordForm.ConfirmPassword" />
-                </small>
-            </div>
-            <div class="grid">
-                <button type="submit">
-                    Save
-                </button>
-            </div>
-        </EditForm>
-    </article>
-</section>
+<MudContainer>
+	<MudStack>
+		<MudText Typo="Typo.h2">Profile</MudText>
+
+		<MudPaper Class="pa-4" Elevation="2">
+			<MudText Typo="Typo.h3">Profile Information</MudText>
+			<MudText Typo="Typo.caption">Update your account's profile information.</MudText>
+
+			<EditForm Model="ProfileInformationForm" OnValidSubmit="SaveProfileInformation">
+				<DataAnnotationsValidator />
+
+				<MudTextField T="string" Label="Name" @bind-Value="ProfileInformationForm.Name" For="() => ProfileInformationForm.Name" />
+
+				<MudTextField T="string" Label="Email address" @bind-Value="ProfileInformationForm.Email" For="() => ProfileInformationForm.Email" InputType="InputType.Email" />
+				<small>
+					@if (!string.IsNullOrEmpty(_profileFormMessage))
+					{
+						@_profileFormMessage
+					}
+				</small>
+
+				<MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Class="mt-2">Save</MudButton>
+			</EditForm>
+		</MudPaper>
+
+		<MudPaper Class="mt-4 pa-4" Elevation="2">
+			<MudText Typo="Typo.h3">Update Password</MudText>
+			<MudText Typo="Typo.caption">Update your accounts current password.</MudText>
+
+			<EditForm Model="PasswordForm" OnValidSubmit="UpdatePassword">
+				<DataAnnotationsValidator />
+
+				<MudTextField T="string" Label="Current Password" @bind-Value="PasswordForm.CurrentPassword" For="() => PasswordForm.CurrentPassword" InputType="InputType.Password" />
+				<small>
+					@if (!string.IsNullOrEmpty(_passwordFormMessage))
+					{
+						@_passwordFormMessage
+					}
+				</small>
+
+				<MudTextField T="string" Label="New Password" @bind-Value="PasswordForm.NewPassword" For="() => PasswordForm.NewPassword" InputType="InputType.Password" />
+
+				<MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Class="mt-2">Save</MudButton>
+			</EditForm>
+		</MudPaper>
+	</MudStack>
+</MudContainer>
 @code {
-    [CascadingParameter]
-    public MainLayout? Layout { get; set; }
-    private User? user => Layout.User;
-    private ProfileInformationForm profileInformationForm { get; set; } = new();
-    private string profileFormMessage = "";
-    private PasswordForm passwordForm { get; set; } = new();
-    private string passwordFormMessage = "";
+	[CascadingParameter]
+	public MainLayout? Layout { get; set; }
+	private User? User => Layout?.User;
+	private ProfileInformationFormVM ProfileInformationForm { get; } = new();
+	private string _profileFormMessage = "";
+	private PasswordFormVM PasswordForm { get; } = new();
+	private string _passwordFormMessage = "";
 
 
-    protected override async Task OnInitializedAsync()
-    {
-        // get user profile
-        profileInformationForm.Name = user.Name;
-        profileInformationForm.Email = user.Email;
-    }
+	protected override void OnInitialized()
+	{
+		// get User profile
+		ProfileInformationForm.Name = User!.Name;
+		ProfileInformationForm.Email = User.Email;
+	}
 
-    private async Task SaveProfileInformation()
-    {
-        using var db = factory.CreateDbContext();
-        var currentUser = db.Users.Find(user.Id);
+	private async Task SaveProfileInformation()
+	{
+		await using DatabaseContext db = await Factory.CreateDbContextAsync();
+		User? currentUser = await db.Users.FindAsync(User!.Id);
 
-        if (currentUser != null)
-        {
-            var existingUser = await _usersService.FindUserByEmailAsync(profileInformationForm.Email);
+		if (currentUser is null) return;
 
-            if (existingUser != null && user.Id != existingUser.Id)
-            {
-                profileFormMessage = "Email already in use.";
-                return;
-            }
+		User? existingUser = await UsersService.FindUserByEmailAsync(ProfileInformationForm.Email);
 
-            currentUser.Email = profileInformationForm.Email;
-            currentUser.Name = profileInformationForm.Name;
+		if (existingUser is not null && User.Id != existingUser.Id)
+		{
+			_profileFormMessage = "Email already in use.";
+			return;
+		}
 
-            db.Users.Save(currentUser);
-            StateHasChanged();
-            _navManager.NavigateTo("profile/edit", true);
-        }
-    }
+		currentUser.Email = ProfileInformationForm.Email;
+		currentUser.Name = ProfileInformationForm.Name;
 
-    private async Task UpdatePassword()
-    {
-        using var db = factory.CreateDbContext();
-        var existingUser = await _usersService.FindUserAsync(user.Email, _usersService.GetSha256Hash(passwordForm.CurrentPassword));
+		db.Users.Save(currentUser);
+		StateHasChanged();
+		NavManager.NavigateTo("profile/edit", true);
+	}
 
-        if (existingUser == null)
-        {
-            passwordFormMessage = "Current password was incorrect.";
-            return;
-        }
+	private async Task UpdatePassword()
+	{
+		await using DatabaseContext db = await Factory.CreateDbContextAsync();
+		User? existingUser = await UsersService.FindUserAsync(User!.Email, UsersService.GetSha256Hash(PasswordForm.CurrentPassword));
 
-        existingUser.Password = _usersService.GetSha256Hash(passwordForm.NewPassword);
+		if (existingUser is null)
+		{
+			_passwordFormMessage = "Current password was incorrect.";
+			return;
+		}
 
-        db.Users.Save(existingUser);
-        StateHasChanged();
-        _navManager.NavigateTo("profile/edit", true);
-    }
+		existingUser.Password = UsersService.GetSha256Hash(PasswordForm.NewPassword);
 
-    public class ProfileInformationForm
-    {
-        [Required]
-        public string Name { get; set; }
+		db.Users.Save(existingUser);
+		StateHasChanged();
+		NavManager.NavigateTo("profile/edit", true);
+	}
 
-        [EmailAddress(ErrorMessage = "Invalid email address.")]
-        [Required(ErrorMessage = "Please enter a valid email address")]
-        public string Email { get; set; }
-    }
+	public class ProfileInformationFormVM
+	{
+		[Required]
+		public string Name { get; set; } = string.Empty;
 
-    public class PasswordForm
-    {
-        [Required(ErrorMessage = "Current Password is required")]
-        public string CurrentPassword { get; set; }
+		[EmailAddress(ErrorMessage = "Invalid email address.")]
+		[Required(ErrorMessage = "Please enter a valid email address")]
+		public string Email { get; set; } = string.Empty;
+	}
 
-        [Required(ErrorMessage = "New Password is required")]
-        public string NewPassword { get; set; }
+	public class PasswordFormVM
+	{
+		[Required(ErrorMessage = "Current Password is required")]
+		public string CurrentPassword { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Confirm password is required")]
-        [Compare("NewPassword", ErrorMessage = "The New Password and Confirm Password do not match.")]
-        public string ConfirmPassword { get; set; }
-    }
+		[Required(ErrorMessage = "New Password is required")]
+		public string NewPassword { get; set; } = string.Empty;
+	}
 }
