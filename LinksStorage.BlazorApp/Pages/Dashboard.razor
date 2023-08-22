@@ -3,18 +3,13 @@
 
 <PageTitle>Dashboard</PageTitle>
 
-<section>
-    <h1>
-        Dashboard
-    </h1>
-    <article>
-        <p>
-            You're logged in!
-        </p>
-    </article>
-</section>
+<MudContainer Class="mt-4">
+	<MudText Typo="Typo.h2">Dashboard</MudText>
+    
+</MudContainer>
+
 @code {
     [CascadingParameter]
     public MainLayout? Layout { get; set; }
-    private User? user => Layout.User;
+    private User? User => Layout?.User;
 }

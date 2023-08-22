@@ -3,17 +3,15 @@
 
 <PageTitle>Admin Dashboard</PageTitle>
 
-<section>
+<MudContainer Class="mt-4">
     <article>
         <AuthorizeView Roles="@CustomRoles.Admin">
             <Authorized>
-                <h1>
-                    Admin Dashboard
-                </h1>
+                <MudText Typo="Typo.h2">Admin Dashboard</MudText>
             </Authorized>
             <NotAuthorized>
                 <p>Sorry, you do not have the proper permissions to access this page.</p>
             </NotAuthorized>
         </AuthorizeView>
     </article>
-</section>
+</MudContainer>
