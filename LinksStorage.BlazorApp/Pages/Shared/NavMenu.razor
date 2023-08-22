@@ -2,6 +2,9 @@
 <MudAppBar Dense="true">
 	<MudButton Href="/"><ApplicationLogo/></MudButton >
 	<MudSpacer />
+	<MudTooltip Duration="1000" Text="@(DarkTheme ? "Switch to Light Theme" : "Switch to Dark Theme")">
+		<MudIconButton Icon="@(DarkTheme ? @Icons.Material.Rounded.LightMode : @Icons.Material.Outlined.DarkMode)" Color="Color.Inherit" OnClick="ChangeTheme" />
+	</MudTooltip>
 	<MudButton Href="/tags/management">Tags</MudButton >
 	<AuthorizeView>
 		<Authorized>
@@ -22,5 +25,15 @@
 @code {
 	[CascadingParameter]
 	public MainLayout? Layout { get; set; }
+
+	public bool DarkTheme => Layout?.DarkTheme ?? false;
 	private User? User => Layout?.User;
+	[Parameter]
+	public EventCallback<bool> OnThemeChanged { get; set; }
+
+	private async Task ChangeTheme()
+	{
+		if (OnThemeChanged.HasDelegate) await OnThemeChanged.InvokeAsync(!DarkTheme);
+	}
+
 }

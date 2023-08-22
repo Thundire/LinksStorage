@@ -3,13 +3,13 @@
 
 <PageTitle>@Env.Get("APP_NAME")</PageTitle>
 
-<MudThemeProvider />
+<MudThemeProvider @bind-IsDarkMode="DarkTheme"/>
 <MudDialogProvider />
 <MudSnackbarProvider />
 
 <CascadingValue Value="this">
 	<MudLayout>
-		<NavMenu/>
+		<NavMenu OnThemeChanged="SetThemeMode"/>
 		<MudMainContent>
 			@Body
 		</MudMainContent>
@@ -20,6 +20,8 @@
     [CascadingParameter]
     public Task<AuthenticationState> AuthenticationStateTask { get; set; }
     public User? User = new User();
+    [CascadingParameter]
+    public bool DarkTheme { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -30,4 +32,10 @@
             User = await authService.GetAuthenticatedUser();
         }
     }
+
+    private void SetThemeMode(bool darkMode)
+    {
+	    DarkTheme = darkMode;
+    }
+
 }
