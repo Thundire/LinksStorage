@@ -8,103 +8,119 @@
 <PageTitle>Home page</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="mt-2 pa-4">
-<MudGrid Justify="Justify.Center">
-	<MudItem xs="12" sm="7">
-		<MudGrid>
-			<MudItem xs="12">
-				<MudPaper Elevation="2" Class="pa-4">
+	<MudGrid Justify="Justify.Center">
+		<MudItem xs="12" lg="3">
+			<MudPaper Class="pa-4">
+				<MudForm Model="CurrentLink" OnSubmit="CreateOrUpdateLink">
+					<MudTextField T="string" Label="Name" @bind-Value="CurrentLink.Name" />
+					<MudTextField T="string" Label="Url" @bind-Value="CurrentLink.Uri" />
+					<MudButtonGroup Class="mt-4 mb-2" OverrideStyles="false">
+						<MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="CreateOrUpdateLink">@(IsCreating ? "Add" : "Update")</MudButton>
+							<MudButton Color="Color.Info" Variant="Variant.Filled" OnClick="Clear">Clear</MudButton>
+							<MudButton Color="Color.Secondary" Variant="Variant.Filled" OnClick="() => Destroy()">Delete</MudButton>
+						</MudButtonGroup>
+					</MudForm>
+
 					<MudGrid>
-						<MudItem xs="8">
-							<MudChipSet AllClosable="true" OnClose="RemoveFromFilter">
-								@foreach (var tag in FilterTags)
-								{
-									<MudChip Value="tag">@tag.Name</MudChip>
-								}
-							</MudChipSet>
-						</MudItem>
-						<MudItem xs="4">
-							<SearchBox TItem="Tag" Items="FilterTagsDelta"
-							           DisplayTextSelector="t => t.Name"
-							           Filter="(t, s) => t.Name.Contains(s.ToLower(), StringComparison.OrdinalIgnoreCase)"
-							           OnSelected="OnSelectFilter" OnCreateCalled="CreateTagFilter" />
-						</MudItem>
-					</MudGrid>
-				</MudPaper>
-			</MudItem>
+						<MudItem xs="12" md="7" lg="12">
+							<MudChipSet AllClosable="true" OnClose="Remove">
+								@foreach (var tag in CurrentLink.Tags)
+							{
+								<MudChip Value="tag">@tag.Name</MudChip>
+							}
+						</MudChipSet>
+					</MudItem>
 
-			<MudItem xs="12">
-				<MudDataGrid T="Link" MultiSelection="false" Items="@_tableLinks" SortMode="SortMode.Multiple" Filterable="true" Hideable="true"
-				             QuickFilter="@_quickFilter"
-				             RowClick="@SelectLink"
-				             Elevation="2" Class="pa-4" Virtualize FixedHeader Height="58rem">
-					<ToolBarContent>
-						<MudText Typo="Typo.h6">Links</MudText>
-						<MudSpacer />
-						<MudTextField @bind-Value="FilterText" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
-						              AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-					</ToolBarContent>
-					<Columns>
-						@* <SelectColumn T="Link" /> *@
-						<PropertyColumn Property="x => x.Name" Title="Name" StickyLeft="true" CellStyle="width: 45%" Filterable="false" Sortable="false" />
-						<TemplateColumn Title="Tags" Filterable="false" Sortable="false">
-							<CellTemplate>
+					<MudItem xs="12" md="5" lg="12">
+						<SearchBox TItem="Tag" Items="EditFormTagsDelta"
+								   DisplayTextSelector="t => t.Name"
+								   Filter="(t, s) => t.Name.Contains(s.ToLower(), StringComparison.OrdinalIgnoreCase)"
+								   OnSelected="OnSelect" OnCreateCalled="CreateTag" />
+					</MudItem>
+				</MudGrid>
+			</MudPaper>
+		</MudItem>
 
-								<MudChipSet>
-									@foreach (var tag in @context.Item.Tags)
+		<MudItem xs="12" lg="7">
+			<MudGrid>
+				<MudItem xs="12">
+					<MudPaper Elevation="2" Class="pa-4">
+						<MudText Typo="Typo.caption">Tags filter</MudText>
+						<MudGrid>
+							<MudItem xs="12" md="7" lg="12">
+								<MudChipSet AllClosable="true" OnClose="RemoveFromFilter">
+									@foreach (var tag in FilterTags)
 									{
-										<MudChip OnClick="() => OnSelectFilter(tag)">@tag.Name</MudChip>
+										<MudChip Value="tag">@tag.Name</MudChip>
 									}
 								</MudChipSet>
-							</CellTemplate>
-						</TemplateColumn>
-						<TemplateColumn Filterable="false" Sortable="false" StickyRight="true" CellStyle="width: 5%">
-							<CellTemplate>
-								<MudStack Row="true">
-									<MudButton Size="@Size.Small" Variant="Variant.Outlined" OnClick="() => Navigate(context.Item)">Open</MudButton>
-									<MudButton Size="@Size.Small" Color="Color.Error" Variant="Variant.Outlined" OnClick="() => Destroy(context.Item)">Delete</MudButton>
-								</MudStack>
-							</CellTemplate>
-						</TemplateColumn>
-					</Columns>
-					@* <PagerContent>
-						<MudDataGridPager T="Link" />
-					</PagerContent> *@
-				</MudDataGrid>
-			</MudItem>
-		</MudGrid>
-	</MudItem>
-
-	<MudItem xs="12" sm="3">
-		<MudPaper Class="pa-4">
-			<MudForm Model="CurrentLink" OnSubmit="CreateOrUpdateLink">
-				<MudTextField T="string" Label="Name" @bind-Value="CurrentLink.Name" />
-				<MudTextField T="string" Label="Url" @bind-Value="CurrentLink.Uri" />
-				<MudButtonGroup Class="mt-4 mb-2" OverrideStyles="false">
-					<MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="CreateOrUpdateLink">@(IsCreating ? "Add" : "Update")</MudButton>
-					<MudButton Color="Color.Info" Variant="Variant.Filled" OnClick="Clear">Clear</MudButton>
-					<MudButton Color="Color.Secondary" Variant="Variant.Filled" OnClick="() => Destroy()">Delete</MudButton>
-				</MudButtonGroup>
-			</MudForm>
-
-			<MudGrid>
-				<MudItem xs="8">
-					<MudChipSet AllClosable="true" OnClose="Remove">
-						@foreach (var tag in CurrentLink.Tags)
-						{
-							<MudChip Value="tag">@tag.Name</MudChip>
-						}
-					</MudChipSet>
+							</MudItem>
+							<MudItem xs="12" md="5" lg="12">
+								<SearchBox TItem="Tag" Items="FilterTagsDelta"
+										   DisplayTextSelector="t => t.Name"
+										   Filter="(t, s) => t.Name.Contains(s.ToLower(), StringComparison.OrdinalIgnoreCase)"
+										   OnSelected="OnSelectFilter" OnCreateCalled="CreateTagFilter" />
+							</MudItem>
+						</MudGrid>
+					</MudPaper>
 				</MudItem>
-				<MudItem xs="4">
-					<SearchBox TItem="Tag" Items="EditFormTagsDelta"
-					           DisplayTextSelector="t => t.Name"
-					           Filter="(t, s) => t.Name.Contains(s.ToLower(), StringComparison.OrdinalIgnoreCase)"
-					           OnSelected="OnSelect" OnCreateCalled="CreateTag" />
+
+				<MudItem xs="12">
+					<MudDataGrid T="Link" MultiSelection="false" Items="@_tableLinks" SortMode="SortMode.Multiple" Filterable="true" Hideable="true"
+								 QuickFilter="@_quickFilter"
+								 RowClick="@SelectLink"
+								 Elevation="2" Class="pa-4 object-cover" Virtualize FixedHeader Height="50em" Dense>
+						<ToolBarContent>
+							<MudText Typo="Typo.h6">Links</MudText>
+							<MudSpacer />
+							<MudTextField @bind-Value="FilterText" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+										  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+						</ToolBarContent>
+						<Columns>
+							@* <SelectColumn T="Link" /> *@
+							<TemplateColumn Title="Name" Filterable="false" Sortable="false">
+								<CellTemplate>
+									<MudGrid>
+										<MudItem xs="12" sm="10">
+											<MudText Typo="Typo.body1">@context.Item.Name</MudText>
+										</MudItem>
+										
+										<MudItem xs="12" sm="2">
+											<MudTooltip Delay="400" Text="@context.Item.Uri" Placement="Placement.Bottom">
+												<MudIcon Icon="@Icons.Material.TwoTone.Link" />
+											</MudTooltip>
+										</MudItem>
+									</MudGrid>
+								</CellTemplate>
+							</TemplateColumn>
+							<TemplateColumn Title="Tags" Filterable="false" Sortable="false">
+								<CellTemplate>
+									<MudChipSet>
+										@foreach (var tag in @context.Item.Tags)
+										{
+											<MudChip OnClick="() => OnSelectFilter(tag)">@tag.Name</MudChip>
+										}
+									</MudChipSet>
+								</CellTemplate>
+							</TemplateColumn>
+							<TemplateColumn Filterable="false" Sortable="false" StickyRight="true">
+								<CellTemplate>
+									<MudStack Row="true">
+										<MudButton Size="@Size.Small" Variant="Variant.Outlined" OnClick="() => Navigate(context.Item)">Open</MudButton>
+										<MudButton Size="@Size.Small" Color="Color.Error" Variant="Variant.Outlined" OnClick="() => Destroy(context.Item)">Delete</MudButton>
+									</MudStack>
+								</CellTemplate>
+							</TemplateColumn>
+						</Columns>
+
+						@* <PagerContent>
+						<MudDataGridPager T="Link" />
+						</PagerContent> *@
+					</MudDataGrid>
 				</MudItem>
 			</MudGrid>
-		</MudPaper>
-	</MudItem>
-</MudGrid>
+		</MudItem>
+	</MudGrid>
 </MudContainer>
 
 
@@ -250,5 +266,4 @@
 	{
 		DrawerOpen = true;
 	}
-
 }

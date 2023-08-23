@@ -2,7 +2,7 @@
 
 <div @onfocusin="ShowItems" @onfocusout="HideItems">
 	<MudStack Row="true">
-		<MudTextField T="string" @bind-value="filter" Immediate autocomplete="off" aria-autocomplete="none" />
+		<MudTextField T="string" @bind-value="filter" Placeholder="Tags" Immediate autocomplete="off" aria-autocomplete="none" />
 		@if (Items is not null && IsShowItems)
 		{
 			<MudButton Size="Size.Small" OnClick="HideItems">Hide</MudButton>
