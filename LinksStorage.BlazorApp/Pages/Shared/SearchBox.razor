@@ -1,15 +1,10 @@
 ﻿@typeparam TItem
 
 <div @onfocusin="ShowItems" @onfocusout="HideItems">
-	<MudStack Row="true">
-		<MudTextField T="string" @bind-value="filter" Placeholder="Tags" Immediate autocomplete="off" aria-autocomplete="none" />
-		@if (Items is not null && IsShowItems)
-		{
-			<MudButton Size="Size.Small" OnClick="HideItems">Hide</MudButton>
-		}
-	</MudStack>
-
-	<MudPopover Open="Items is not null && IsShowItems" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" RelativeWidth>
+	<MudTextField T="string" @bind-value="filter" Placeholder="Tags" Clearable Immediate autocomplete="off" aria-autocomplete="none" />
+	
+	<MudPopover Open="Items is not null && IsShowItems" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.BottomCenter" OverflowBehavior="OverflowBehavior.FlipOnOpen" RelativeWidth>
+		<MudButton Size="Size.Small" OnClick="HideItems" FullWidth>Hide</MudButton>
 		<MudButton FullWidth OnClick="Create">Create</MudButton>
 		<MudList Clickable Dense Style="height: 300px; overflow: auto;">
 			@if (FilteredItems is { Count: > 0 })
@@ -55,14 +50,14 @@
 		IsShowItems = true;
 	}
 
-	private async Task HideItems()
+	public async Task HideItems()
 	{
 		IsClosing = true;
 		await Task.Delay(100);
 		if (IsClosing) IsShowItems = false;
 	}
 
-	private void Hide()
+	public void Hide()
 	{
 		IsShowItems = false;
 	}

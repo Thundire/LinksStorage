@@ -12,19 +12,19 @@
 		<MudItem xs="12" lg="3">
 			<MudPaper Class="pa-4">
 				<MudForm Model="CurrentLink" OnSubmit="CreateOrUpdateLink">
-					<MudTextField T="string" Label="Name" @bind-Value="CurrentLink.Name" />
-					<MudTextField T="string" Label="Url" @bind-Value="CurrentLink.Uri" />
+					<MudTextField T="string" Label="Name" @bind-Value="CurrentLink.Name" DebounceInterval="1500" Clearable TextChanged="ClearSearchBoxFocus" />
+					<MudTextField T="string" Label="Url" @bind-Value="CurrentLink.Uri" DebounceInterval="1500" Clearable TextChanged="ClearSearchBoxFocus" />
 					<MudButtonGroup Class="mt-4 mb-2" OverrideStyles="false">
 						<MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="CreateOrUpdateLink">@(IsCreating ? "Add" : "Update")</MudButton>
-							<MudButton Color="Color.Info" Variant="Variant.Filled" OnClick="Clear">Clear</MudButton>
-							<MudButton Color="Color.Secondary" Variant="Variant.Filled" OnClick="() => Destroy()">Delete</MudButton>
-						</MudButtonGroup>
-					</MudForm>
+						<MudButton Color="Color.Info" Variant="Variant.Filled" OnClick="Clear">Clear</MudButton>
+						<MudButton Color="Color.Secondary" Variant="Variant.Filled" OnClick="() => Destroy()">Delete</MudButton>
+					</MudButtonGroup>
+				</MudForm>
 
-					<MudGrid>
-						<MudItem xs="12" md="7" lg="12">
-							<MudChipSet AllClosable="true" OnClose="Remove">
-								@foreach (var tag in CurrentLink.Tags)
+				<MudGrid>
+					<MudItem xs="12" md="7" lg="12">
+						<MudChipSet AllClosable="true" OnClose="Remove">
+							@foreach (var tag in CurrentLink.Tags)
 							{
 								<MudChip Value="tag">@tag.Name</MudChip>
 							}
@@ -32,7 +32,7 @@
 					</MudItem>
 
 					<MudItem xs="12" md="5" lg="12">
-						<SearchBox TItem="Tag" Items="EditFormTagsDelta"
+						<SearchBox @ref="_formSearchBox" TItem="Tag" Items="EditFormTagsDelta"
 								   DisplayTextSelector="t => t.Name"
 								   Filter="(t, s) => t.Name.Contains(s.ToLower(), StringComparison.OrdinalIgnoreCase)"
 								   OnSelected="OnSelect" OnCreateCalled="CreateTag" />
@@ -56,7 +56,7 @@
 								</MudChipSet>
 							</MudItem>
 							<MudItem xs="12" md="5" lg="12">
-								<SearchBox TItem="Tag" Items="FilterTagsDelta"
+								<SearchBox @ref="_filterSearchBox" TItem="Tag" Items="FilterTagsDelta"
 										   DisplayTextSelector="t => t.Name"
 										   Filter="(t, s) => t.Name.Contains(s.ToLower(), StringComparison.OrdinalIgnoreCase)"
 										   OnSelected="OnSelectFilter" OnCreateCalled="CreateTagFilter" />
@@ -67,14 +67,14 @@
 
 				<MudItem xs="12">
 					<MudDataGrid T="Link" MultiSelection="false" Items="@_tableLinks" SortMode="SortMode.Multiple" Filterable="true" Hideable="true"
-								 QuickFilter="@_quickFilter"
+								 QuickFilter="@QuickFilter"
 								 RowClick="@SelectLink"
 								 Elevation="2" Class="pa-4 object-cover" Virtualize FixedHeader Height="50em" Dense>
 						<ToolBarContent>
 							<MudText Typo="Typo.h6">Links</MudText>
 							<MudSpacer />
-							<MudTextField @bind-Value="FilterText" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
-										  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+							<MudTextField @bind-Value="FilterText" Placeholder="Search" Adornment="Adornment.Start" Immediate Clearable
+							              AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
 						</ToolBarContent>
 						<Columns>
 							@* <SelectColumn T="Link" /> *@
@@ -84,7 +84,7 @@
 										<MudItem xs="12" sm="10">
 											<MudText Typo="Typo.body1">@context.Item.Name</MudText>
 										</MudItem>
-										
+
 										<MudItem xs="12" sm="2">
 											<MudTooltip Delay="400" Text="@context.Item.Uri" Placement="Placement.Bottom">
 												<MudIcon Icon="@Icons.Material.TwoTone.Link" />
@@ -140,6 +140,9 @@
 	private List<Tag> FilterTagsDelta => Tags.Except(FilterTags).ToList();
 	private bool DrawerOpen { get; set; }
 
+	private SearchBox<Tag>? _formSearchBox;
+	private SearchBox<Tag>? _filterSearchBox;
+
 	protected override async Task OnInitializedAsync()
 	{
 		Logger.Information($"Initialized at {DateTime.Now}");
@@ -147,7 +150,7 @@
 		Tags = await TagsRepository.Query();
 	}
 
-	private Func<Link, bool> _quickFilter => x =>
+	private Func<Link, bool> QuickFilter => x =>
 	{
 		var lowerFilterText = FilterText.ToLower();
 		if ((string.IsNullOrEmpty(FilterText) || x.Name.ToLower().Contains(lowerFilterText) || x.Uri.Contains(lowerFilterText))
@@ -266,4 +269,12 @@
 	{
 		DrawerOpen = true;
 	}
+
+	private void ClearSearchBoxFocus()
+	{
+		_formSearchBox?.HideItems();
+		_filterSearchBox?.HideItems();
+		StateHasChanged();
+	}
+
 }
