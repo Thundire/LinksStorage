@@ -4,12 +4,7 @@ namespace LinksStorage.BlazorApp.Application.Models;
 
 public class Role : BaseModel
 {
-	public Role()
-	{
-		UserRoles = new HashSet<UserRole>();
-	}
+	public string Name { get; set; } = string.Empty;
 
-	public string Name { get; set; }
-
-	public virtual ICollection<UserRole> UserRoles { get; set; }
+	public virtual ICollection<UserRole> UserRoles { get; set; } = new HashSet<UserRole>();
 }

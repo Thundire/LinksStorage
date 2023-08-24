@@ -21,9 +21,8 @@ public class RegisterModel : PageModel
 	private readonly AuthService _cookieService;
 	private IDispatcher _dispatcher;
 
-	[BindProperty]
-	public InputModel Input { get; set; }
-	public string ReturnUrl { get; set; }
+	[BindProperty] public InputModel? Input { get; set; }
+	public string ReturnUrl { get; set; } = string.Empty;
 
 	public RegisterModel(
 		IConfiguration configuration,
@@ -76,7 +75,7 @@ public class RegisterModel : PageModel
 		await _dispatcher.Broadcast(userCreated);
 
 		var user = await _usersService.FindUserAsync(newUser.Email, newUser.Password);
-
+		_ = user ?? throw new InvalidOperationException("User created, but not found");
 		var cookieExpirationDays = _configuration.GetValue("Spark:Auth:CookieExpirationDays", 5);
 		var cookieClaims = await _cookieService.CreateCookieClaims(user);
 
@@ -97,16 +96,16 @@ public class RegisterModel : PageModel
 public class InputModel
 {
 	[Required(ErrorMessage = "Name is required")]
-	public string Name { get; set; }
+	public string Name { get; set; } = string.Empty;
 
 	[EmailAddress(ErrorMessage = "Invalid email address")]
 	[Required(ErrorMessage = "Email is required")]
-	public string Email { get; set; }
+	public string Email { get; set; } = string.Empty;
 
 	[Required(ErrorMessage = "Password is required")]
-	public string Password { get; set; }
+	public string Password { get; set; } = string.Empty;
 
 	[Required(ErrorMessage = "Confirm password is required")]
 	[Compare("Password", ErrorMessage = "The Password and Confirm Password do not match.")]
-	public string ConfirmPassword { get; set; }
+	public string ConfirmPassword { get; set; } = string.Empty;
 }

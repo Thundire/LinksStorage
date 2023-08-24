@@ -27,8 +27,7 @@ public class LoginModel : PageModel
 		_cookieService = cookieService;
 	}
 
-	[BindProperty]
-	public LoginForm Input { get; set; }
+	[BindProperty] public LoginForm Input { get; set; } = new();
 
 	public void OnGet()
 	{
@@ -74,12 +73,12 @@ public class LoginModel : PageModel
 	{
 		[Display(Name = "Email")]
 		[Required(ErrorMessage = "Please enter a valid email address")]
-		public string Email { get; set; }
+		public string Email { get; set; } = string.Empty;
 
 		[Display(Name = "Password")]
 		[Required(ErrorMessage = "Invalid password")]
 		[DataType(DataType.Password)]
-		public string Password { get; set; }
+		public string Password { get; set; } = string.Empty;
 		public bool RememberMe { get; set; } = false;
 
 	}

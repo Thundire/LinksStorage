@@ -17,29 +17,29 @@ public class AuthValidator : IAuthValidator
 
 	public async Task ValidateAsync(CookieValidatePrincipalContext context)
 	{
-		var claimsIdentity = context.Principal.Identity as ClaimsIdentity;
+		var claimsIdentity = context.Principal?.Identity as ClaimsIdentity;
 		if (claimsIdentity?.Claims == null || !claimsIdentity.Claims.Any())
 		{
 			// this is not our issued cookie
-			await handleUnauthorizedRequest(context);
+			await HandleUnauthorizedRequest(context);
 			return;
 		}
 
-		var userIdString = claimsIdentity.FindFirst(ClaimTypes.UserData).Value;
+		var userIdString = claimsIdentity.FindFirst(ClaimTypes.UserData)?.Value;
 		if (!int.TryParse(userIdString, out int userId))
 		{
-			await handleUnauthorizedRequest(context);
+			await HandleUnauthorizedRequest(context);
 			return;
 		}
 
 		var user = await _usersService.FindUserAsync(userId);
 		if (user == null)
 		{
-			await handleUnauthorizedRequest(context);
+			await HandleUnauthorizedRequest(context);
 		}
 	}
 
-	private Task handleUnauthorizedRequest(CookieValidatePrincipalContext context)
+	private Task HandleUnauthorizedRequest(CookieValidatePrincipalContext context)
 	{
 		context.RejectPrincipal();
 		return context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
